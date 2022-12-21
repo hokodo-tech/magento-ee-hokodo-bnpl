@@ -1,1 +1,1 @@
-The Hokodo_BNPL module integrates Magento EE with the Hokodo payments.
+The Hokodo_BnplCommerce module adds additional fetures to Company entity in Adobe Commerce (Magento EE).
