@@ -48,4 +48,10 @@
         </arguments>
     </virtualType>
     <!-- /Company Search -->
+
+    <!-- Company auto match feature -->
+    <type name="Magento\Company\Model\ResourceModel\Company">
+        <plugin name="hokodo_match_company" type="Hokodo\BnplCommerce\Plugin\Company\ResourceModel\Company" />
+    </type>
+    <!-- /Company auto match feature -->
 </config>
