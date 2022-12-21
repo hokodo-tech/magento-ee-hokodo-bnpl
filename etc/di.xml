@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Hokodo\BnplCommerce\Api\Data\CompanyInterface" type="Hokodo\BnplCommerce\Model\Data\Company" />
+    <preference for="Hokodo\BnplCommerce\Api\CompanyRepositoryInterface" type="Hokodo\BnplCommerce\Model\CompanyRepository" />
+    <type name="Magento\Company\Model\Company\DataProvider">
+        <plugin name="add_hokodo_data" type="Hokodo\BnplCommerce\Plugin\Company\Model\DataProvider"/>
+    </type>
+
+    <!-- Company Search -->
+    <preference for="Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface" type="\Hokodo\BnplCommerce\Model\Data\Gateway\CompanySearchRequest" />
+
+    <virtualType name="Hokodo\BNPL\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="hokodo_company_search" xsi:type="string">Hokodo\BnplCommerce\Gateway\Command\CompanySearch</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Command\CompanySearch" type="Hokodo\BNPL\Gateway\Command\HokodoGatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Hokodo\BnplCommerce\Gateway\Request\CompanySearch\BuilderComposite</argument>
+            <argument name="resultFactory" xsi:type="object">Hokodo\BnplCommerce\Gateway\Command\CompanySearch\ResultInterfaceFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanySearch\BuilderComposite" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="api_key" xsi:type="string">Hokodo\BNPL\Gateway\Request\AuthorizationBuilder</item>
+                <item name="uri" xsi:type="string">Hokodo\BnplCommerce\Gateway\Request\CompanySearch</item>
+                <item name="method" xsi:type="string">Hokodo\BNPL\Gateway\Request\PostMethodBuilder</item>
+                <item name="body" xsi:type="string">Hokodo\BnplCommerce\Gateway\Request\CompanySearchEventBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanySearchEventBuilder" type="Hokodo\BNPL\Gateway\Request\Sdk\GeneralSubjectBuilder">
+        <arguments>
+            <argument name="endpointBuilder" xsi:type="object">Hokodo\BnplCommerce\Gateway\Request\CompanySearch</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanySearch" type="Hokodo\BNPL\Gateway\Request\Sdk\EndpointBuilder">
+        <arguments>
+            <argument name="endpoint" xsi:type="string">companies/search</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Command\CompanySearch\ResultInterfaceFactory" type="Magento\Payment\Gateway\Command\ResultInterfaceFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">\Hokodo\BNPL\Gateway\Command\Result\Company</argument>
+        </arguments>
+    </virtualType>
+    <!-- /Company Search -->
+
+    <!-- Company auto match feature -->
+    <type name="Magento\Company\Model\ResourceModel\Company">
+        <plugin name="hokodo_match_company" type="Hokodo\BnplCommerce\Plugin\Company\ResourceModel\Company" />
+    </type>
+    <!-- /Company auto match feature -->
+</config>

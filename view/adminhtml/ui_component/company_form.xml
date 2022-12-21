@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd" component="Magento_CompanyCredit/js/form/form">
+    <fieldset name="hokodo" sortOrder="999" class="Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset">
+        <settings>
+            <collapsible>true</collapsible>
+            <label translate="true">Hokodo</label>
+            <dataScope>hokodo</dataScope>
+        </settings>
+        <field name="companyId" component="Hokodo_BNPL/js/sdk/company-search"
+            sortOrder="10"
+            formElement="input"
+            template="Hokodo_BNPL/sdk/company-search">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="entityIdSelector" xsi:type="string">id</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <visible>true</visible>
+            </settings>
+        </field>
+    </fieldset>
+</form>
