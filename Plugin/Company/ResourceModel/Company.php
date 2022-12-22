@@ -13,6 +13,10 @@ use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
 
 class Company
 {
+    public const DEFAULT_REG_NUMBER_ATTRIBUTE_CODE = 'vat_tax_id';
+
+    private string $regNumberAttributeCode;
+
     /**
      * @var \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface
      */
@@ -34,15 +38,18 @@ class Company
      * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface $companyRepository
      * @param \Hokodo\BnplCommerce\Gateway\Service\Company $gateway
      * @param \Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory $companySearchRequestFactory
+     * @param string|null $regNumberAttributeCode
      */
     public function __construct(
         CompanyRepositoryInterface           $companyRepository,
         Gateway                              $gateway,
-        CompanySearchRequestInterfaceFactory $companySearchRequestFactory
+        CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
+        ?string                              $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
         $this->gateway = $gateway;
         $this->companySearchRequestFactory = $companySearchRequestFactory;
+        $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
     }
 
     /**
@@ -79,7 +86,7 @@ class Company
         $searchRequest = $this->companySearchRequestFactory->create();
         $searchRequest
             ->setCountry($company->getCountryId())
-            ->setRegNumber($company->getVatTaxId());
+            ->setRegNumber($company->getData($this->regNumberAttributeCode));
         if ($list = $this->gateway->search($searchRequest)->getList()) {
             return reset($list);
         }
