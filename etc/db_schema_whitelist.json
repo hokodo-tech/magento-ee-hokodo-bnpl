@@ -3,7 +3,8 @@
     "column": {
       "id": true,
       "entity_id": true,
-      "company_id": true
+      "company_id": true,
+      "organisation_id": true
     },
     "index": {
       "HOKODO_COMPANY_ID": true

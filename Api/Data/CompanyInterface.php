@@ -2,7 +2,9 @@
 
 namespace Hokodo\BnplCommerce\Api\Data;
 
-interface CompanyInterface
+use Hokodo\BNPL\Api\Data\HokodoEntityInterface;
+
+interface CompanyInterface extends HokodoEntityInterface
 {
     /**
      * String constants for property names.
@@ -10,6 +12,7 @@ interface CompanyInterface
     public const ID = 'id';
     public const ENTITY_ID = 'entity_id';
     public const COMPANY_ID = 'company_id';
+    public const ORGANISATION_ID = 'organisation_id';
 
     /**
      * Getter for Id.
@@ -58,4 +61,20 @@ interface CompanyInterface
      * @return self
      */
     public function setCompanyId(?string $companyId): self;
+
+    /**
+     * Organisation Id getter.
+     *
+     * @return string|null
+     */
+    public function getOrganisationId(): ?string;
+
+    /**
+     * Organisation Id setter.
+     *
+     * @param string $organisationId
+     *
+     * @return $this
+     */
+    public function setOrganisationId(string $organisationId): self;
 }
