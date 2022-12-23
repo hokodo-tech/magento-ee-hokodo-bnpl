@@ -1,7 +1,7 @@
 {
-    "name": "hokodo/module-bnpl-commerce",
-    "version": "1.0.0",
-    "description": "Hokodo BNPL for Adobe Commerce version.",
+    "name": "hokodo/magento-ee-bnpl",
+    "version": "0.0.1",
+    "description": "Hokodo BNPL module for Magento EE",
     "type": "magento2-module",
     "minimum-stability": "stable",
     "repositories": [
