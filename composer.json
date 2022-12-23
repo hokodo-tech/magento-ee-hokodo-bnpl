@@ -29,7 +29,8 @@
     },
     "readme": "./README.md",
     "license": [
-        "Proprietary"
+        "OSL-3.0",
+        "AFL-3.0"
     ],
     "autoload": {
         "files": [
