@@ -79,4 +79,27 @@ class Company extends DataObject implements CompanyInterface
         $this->setData(self::COMPANY_ID, $companyId);
         return $this;
     }
+
+    /**
+     * Getter for OrganizationId.
+     *
+     * @return string|null
+     */
+    public function getOrganisationId(): ?string
+    {
+        return $this->getData(self::ORGANISATION_ID);
+    }
+
+    /**
+     * Setter for OrganizationId.
+     *
+     * @param string|null $companyId
+     *
+     * @return self
+     */
+    public function setOrganisationId(?string $organisationId): self
+    {
+        $this->setData(self::ORGANISATION_ID, $organisationId);
+        return $this;
+    }
 }

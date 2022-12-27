@@ -12,7 +12,6 @@ use Hokodo\BnplCommerce\Model\CompanyFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Exception\CouldNotDeleteException;
 
 class CompanyRepository implements CompanyRepositoryInterface
 {

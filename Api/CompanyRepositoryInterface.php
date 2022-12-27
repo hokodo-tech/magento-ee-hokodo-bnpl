@@ -9,9 +9,18 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Api;
 
 use Hokodo\BNPL\Api\HokodoEntityRepositoryInterface;
+use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 
 interface CompanyRepositoryInterface extends HokodoEntityRepositoryInterface
 {
+    /**
+     * Save company to db.
+     *
+     * @param \Hokodo\BnplCommerce\Api\Data\CompanyInterface $company
+     *
+     * @return void
+     */
+    public function save(CompanyInterface $company): CompanyInterface;
     /**
      * Get Company by entity id.
      *
