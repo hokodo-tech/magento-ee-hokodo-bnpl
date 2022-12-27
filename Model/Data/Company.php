@@ -93,7 +93,7 @@ class Company extends DataObject implements CompanyInterface
     /**
      * Setter for OrganizationId.
      *
-     * @param string|null $companyId
+     * @param string|null $organisationId
      *
      * @return self
      */
