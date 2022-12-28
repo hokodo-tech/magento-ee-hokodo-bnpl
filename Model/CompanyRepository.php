@@ -6,9 +6,7 @@ namespace Hokodo\BnplCommerce\Model;
 
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
-use Hokodo\BNPL\Api\Data\HokodoEntityInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
-use Hokodo\BnplCommerce\Model\CompanyFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
@@ -16,22 +14,22 @@ use Magento\Framework\Api\DataObjectHelper;
 class CompanyRepository implements CompanyRepositoryInterface
 {
     /**
-     * @var \Magento\Framework\Api\DataObjectHelper
+     * @var DataObjectHelper
      */
     private DataObjectHelper $dataObjectHelper;
 
     /**
-     * @var \Hokodo\BnplCommerce\Model\CompanyFactory
+     * @var CompanyFactory
      */
     private CompanyFactory $companyFactory;
 
     /**
-     * @var \Hokodo\BnplCommerce\Model\ResourceModel\Company
+     * @var CompanyResource
      */
     private CompanyResource $companyResource;
 
     /**
-     * @var \Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory
+     * @var CompanyInterfaceFactory
      */
     private CompanyInterfaceFactory $companyInterfaceFactory;
 
@@ -43,16 +41,16 @@ class CompanyRepository implements CompanyRepositoryInterface
     /**
      * CompanyRepository constructor.
      *
-     * @param DataObjectHelper $dataObjectHelper
-     * @param CompanyFactory $companyFactory
-     * @param Company $companyResource
-     * @param CompanyInterfaceFactory $companyInterfaceFactory
+     * @param DataObjectHelper           $dataObjectHelper
+     * @param CompanyFactory             $companyFactory
+     * @param CompanyResource            $companyResource
+     * @param CompanyInterfaceFactory    $companyInterfaceFactory
      * @param CompanyManagementInterface $companyManagement
      */
     public function __construct(
-        DataObjectHelper        $dataObjectHelper,
-        CompanyFactory          $companyFactory,
-        CompanyResource         $companyResource,
+        DataObjectHelper $dataObjectHelper,
+        CompanyFactory $companyFactory,
+        CompanyResource $companyResource,
         CompanyInterfaceFactory $companyInterfaceFactory,
         CompanyManagementInterface $companyManagement
     ) {
@@ -81,6 +79,7 @@ class CompanyRepository implements CompanyRepositoryInterface
      * Get Hokodo Company Instance By Customer Id.
      *
      * @param int $entityId
+     *
      * @return CompanyInterface
      */
     public function getById(int $entityId): CompanyInterface

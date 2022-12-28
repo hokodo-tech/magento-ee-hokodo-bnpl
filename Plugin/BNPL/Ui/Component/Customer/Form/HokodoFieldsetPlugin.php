@@ -30,9 +30,9 @@ class HokodoFieldsetPlugin
      * Hide Company (Hokodo) Tab in Customer account in Magento Backend if company stored in Hokodo Company instance.
      *
      * @param HokodoFieldset $subject
-     * @param boolean $result
+     * @param bool           $result
      *
-     * @return boolean
+     * @return bool
      */
     public function afterIsComponentVisible(HokodoFieldset $subject, $result): bool
     {

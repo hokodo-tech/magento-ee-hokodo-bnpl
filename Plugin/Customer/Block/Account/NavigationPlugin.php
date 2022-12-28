@@ -34,7 +34,7 @@ class NavigationPlugin
      * Hide My Company Tab in Customer account if company stored in Hokodo Company instance.
      *
      * @param Navigation $subject
-     * @param array $result
+     * @param array      $result
      *
      * @return array
      */

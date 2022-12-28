@@ -14,7 +14,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 class EntityLevel implements OptionSourceInterface
 {
     /**
-     * Get Options Array
+     * Get Options Array.
      *
      * @return array[]
      */

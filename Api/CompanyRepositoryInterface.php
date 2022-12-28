@@ -18,9 +18,10 @@ interface CompanyRepositoryInterface extends HokodoEntityRepositoryInterface
      *
      * @param \Hokodo\BnplCommerce\Api\Data\CompanyInterface $company
      *
-     * @return void
+     * @return CompanyInterface
      */
     public function save(CompanyInterface $company): CompanyInterface;
+
     /**
      * Get Company by entity id.
      *
