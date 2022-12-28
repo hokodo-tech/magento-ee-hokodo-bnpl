@@ -54,4 +54,12 @@
         <plugin name="hokodo_match_company" type="Hokodo\BnplCommerce\Plugin\Company\ResourceModel\Company" />
     </type>
     <!-- /Company auto match feature -->
+    <preference for="Hokodo\BNPL\Api\HokodoEntityResolverInterface" type="Hokodo\BnplCommerce\Model\HokodoEntityResolver"/>
+    <type name="Hokodo\BNPL\Model\HokodoCompanyProvider">
+        <arguments>
+            <argument name="companyProviderTypes" xsi:type="array">
+                <item name="company" xsi:type="object">Hokodo\BnplCommerce\Api\CompanyRepositoryInterface</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

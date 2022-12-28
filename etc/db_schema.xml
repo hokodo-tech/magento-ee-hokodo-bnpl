@@ -5,6 +5,7 @@
         <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="Id" />
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="false" comment="Magento company id" />
         <column xsi:type="varchar" name="company_id" nullable="false" length="64" comment="Hokodo company id" />
+        <column xsi:type="varchar" name="organisation_id" nullable="false" length="255" comment="Hokodo Organisation Id"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id" />
         </constraint>

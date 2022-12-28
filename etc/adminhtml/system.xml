@@ -11,11 +11,12 @@
         <section id="payment">
             <group id="hokodo_bnpl">
                 <group id="advanced">
-                    <field id="data_source" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <field id="entity_level" translate="label comment" type="select" sortOrder="10"
+                           showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                         <label>Instance where Company Info stored</label>
                         <comment><![CDATA[Pay attention this setting can not be changed.]]></comment>
-                        <source_model>Hokodo\BNPLCommerce\Model\Adminhtml\Source\DataSource</source_model>
-                        <frontend_model>Hokodo\BNPLCommerce\Block\Adminhtml\System\Config\Disable</frontend_model>
+                        <source_model>Hokodo\BnplCommerce\Model\Source\EntityForSave\EntityLevel</source_model>
+                        <frontend_model>Hokodo\BnplCommerce\Block\Adminhtml\System\Config\Disable</frontend_model>
                     </field>
                 </group>
             </group>
