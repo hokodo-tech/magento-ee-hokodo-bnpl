@@ -51,22 +51,22 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     /**
      * SaveCompanyId constructor.
      *
-     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Backend\App\Action\Context                 $context
      * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface $companyRepository
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Customer\Api\SessionCleanerInterface $sessionCleaner
-     * @param \Magento\CompanyGraphQl\Model\Company\Users $companyUsers
-     * @param \Magento\Company\Api\CompanyRepositoryInterface $magentoCompanyRepository
-     * @param \Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface $hokodoQuoteRepository
+     * @param \Magento\Quote\Api\CartRepositoryInterface          $cartRepository
+     * @param \Magento\Customer\Api\SessionCleanerInterface       $sessionCleaner
+     * @param \Magento\CompanyGraphQl\Model\Company\Users         $companyUsers
+     * @param \Magento\Company\Api\CompanyRepositoryInterface     $magentoCompanyRepository
+     * @param \Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface     $hokodoQuoteRepository
      */
     public function __construct(
-        Context                           $context,
-        CompanyRepositoryInterface        $companyRepository,
-        CartRepositoryInterface           $cartRepository,
-        SessionCleanerInterface           $sessionCleaner,
-        CompanyUsers                      $companyUsers,
+        Context $context,
+        CompanyRepositoryInterface $companyRepository,
+        CartRepositoryInterface $cartRepository,
+        SessionCleanerInterface $sessionCleaner,
+        CompanyUsers $companyUsers,
         MagentoCompanyRepositoryInterface $magentoCompanyRepository,
-        HokodoQuoteRepositoryInterface    $hokodoQuoteRepository
+        HokodoQuoteRepositoryInterface $hokodoQuoteRepository
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -94,7 +94,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
 
         if ($entityId && $companyId) {
             $hokodoCompany = $this->companyRepository->getByEntityId((int) $entityId);
-            if (! $hokodoCompany->getId()) {
+            if (!$hokodoCompany->getId()) {
                 $hokodoCompany->setId($entityId);
             }
             $hokodoCompany->setCompanyId($companyId);

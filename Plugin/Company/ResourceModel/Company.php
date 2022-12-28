@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Plugin\Company\ResourceModel;
 
@@ -15,6 +16,9 @@ class Company
 {
     public const DEFAULT_REG_NUMBER_ATTRIBUTE_CODE = 'vat_tax_id';
 
+    /**
+     * @var string
+     */
     private string $regNumberAttributeCode;
 
     /**
@@ -35,16 +39,16 @@ class Company
     /**
      * Company constructor.
      *
-     * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface $companyRepository
-     * @param \Hokodo\BnplCommerce\Gateway\Service\Company $gateway
+     * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface                        $companyRepository
+     * @param \Hokodo\BnplCommerce\Gateway\Service\Company                               $gateway
      * @param \Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory $companySearchRequestFactory
-     * @param string|null $regNumberAttributeCode
+     * @param string|null                                                                $regNumberAttributeCode
      */
     public function __construct(
-        CompanyRepositoryInterface           $companyRepository,
-        Gateway                              $gateway,
+        CompanyRepositoryInterface $companyRepository,
+        Gateway $gateway,
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
-        ?string                              $regNumberAttributeCode = null
+        ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
         $this->gateway = $gateway;
@@ -57,14 +61,17 @@ class Company
      *
      * @param \Magento\Company\Model\ResourceModel\Company $subject
      * @param \Magento\Company\Model\ResourceModel\Company $result
-     * @param \Magento\Company\Model\Company $company
+     * @param \Magento\Company\Model\Company               $company
      *
      * @return \Magento\Company\Model\ResourceModel\Company
      */
-    public function afterSave(MagentoCompanyResource $subject, MagentoCompanyResource $result, MagentoCompanyModel $company)
-    {
+    public function afterSave(
+        MagentoCompanyResource $subject,
+        MagentoCompanyResource $result,
+        MagentoCompanyModel $company
+    ) {
         $hokodoCompany = $this->companyRepository->getByEntityId((int) $company->getEntityId());
-        if (! $hokodoCompany->getId() && ($apiCompany = $this->getHokodoApiCompany($company))) {
+        if (!$hokodoCompany->getId() && ($apiCompany = $this->getHokodoApiCompany($company))) {
             $hokodoCompany
                 ->setEntityId((int) $company->getEntityId())
                 ->setCompanyId($apiCompany->getId());
@@ -78,6 +85,7 @@ class Company
      * Get Hokodo API company.
      *
      * @param \Magento\Company\Model\Company $company
+     *
      * @return \Hokodo\BNPL\Gateway\Command\Result\Company|null
      */
     private function getHokodoApiCompany(MagentoCompanyModel $company): ?ApiCompany

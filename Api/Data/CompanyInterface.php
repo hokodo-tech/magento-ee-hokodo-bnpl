@@ -5,11 +5,11 @@ namespace Hokodo\BnplCommerce\Api\Data;
 interface CompanyInterface
 {
     /**
-     * String constants for property names
+     * String constants for property names.
      */
-    public const ID         = "id";
-    public const ENTITY_ID  = "entity_id";
-    public const COMPANY_ID = "company_id";
+    public const ID = 'id';
+    public const ENTITY_ID = 'entity_id';
+    public const COMPANY_ID = 'company_id';
 
     /**
      * Getter for Id.
