@@ -7,7 +7,6 @@ namespace Hokodo\BnplCommerce\Model;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
-use Hokodo\BnplCommerce\Model\CompanyFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Framework\Api\DataObjectHelper;
 
@@ -35,15 +34,16 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     /**
      * CompanyRepository constructor.
-     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
-     * @param \Hokodo\BnplCommerce\Model\CompanyFactory $companyFactory
-     * @param \Hokodo\BnplCommerce\Model\ResourceModel\Company $companyResource
+     *
+     * @param \Magento\Framework\Api\DataObjectHelper               $dataObjectHelper
+     * @param \Hokodo\BnplCommerce\Model\CompanyFactory             $companyFactory
+     * @param \Hokodo\BnplCommerce\Model\ResourceModel\Company      $companyResource
      * @param \Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory $companyInterfaceFactory
      */
     public function __construct(
-        DataObjectHelper        $dataObjectHelper,
-        CompanyFactory          $companyFactory,
-        CompanyResource         $companyResource,
+        DataObjectHelper $dataObjectHelper,
+        CompanyFactory $companyFactory,
+        CompanyResource $companyResource,
         CompanyInterfaceFactory $companyInterfaceFactory
     ) {
         $this->dataObjectHelper = $dataObjectHelper;

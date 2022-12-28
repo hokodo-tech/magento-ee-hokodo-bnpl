@@ -29,11 +29,11 @@ class DataProvider
      * DataProvider constructor.
      *
      * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface $companyRepository
-     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\UrlInterface                     $urlBuilder
      */
     public function __construct(
         CompanyRepositoryInterface $companyRepository,
-        UrlInterface               $urlBuilder
+        UrlInterface $urlBuilder
     ) {
         $this->companyRepository = $companyRepository;
         $this->urlBuilder = $urlBuilder;
@@ -43,7 +43,8 @@ class DataProvider
      * After getCompanyResultData.
      *
      * @param CompanyDataProvider $subject
-     * @param array $result
+     * @param array               $result
+     *
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -58,7 +59,7 @@ class DataProvider
         }
         $result['hokodo'] = [
             'company_id' => $hokodoCompanyId,
-            'submit_url' => $this->urlBuilder->getUrl('hokodo_commerce/company/savecompanyid')
+            'submit_url' => $this->urlBuilder->getUrl('hokodo_commerce/company/savecompanyid'),
         ];
         return $result;
     }
