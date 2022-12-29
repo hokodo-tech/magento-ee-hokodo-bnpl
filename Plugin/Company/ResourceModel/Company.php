@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
  */
 declare(strict_types=1);
 
@@ -14,6 +14,9 @@ use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Gateway\Service\Company as Gateway;
 use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Payment\Gateway\Command\CommandException;
+use Psr\Log\LoggerInterface as Logger;
 
 class Company
 {
@@ -25,7 +28,7 @@ class Company
     private string $regNumberAttributeCode;
 
     /**
-     * @var \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface
+     * @var CompanyRepositoryInterface
      */
     private CompanyRepositoryInterface $companyRepository;
 
@@ -35,38 +38,46 @@ class Company
     private Gateway $gateway;
 
     /**
-     * @var \Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory
+     * @var CompanySearchRequestInterfaceFactory
      */
     private CompanySearchRequestInterfaceFactory $companySearchRequestFactory;
 
     /**
+     * @var Logger
+     */
+    private Logger $logger;
+
+    /**
      * Company constructor.
      *
-     * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface                        $companyRepository
-     * @param \Hokodo\BnplCommerce\Gateway\Service\Company                               $gateway
-     * @param \Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory $companySearchRequestFactory
-     * @param string|null                                                                $regNumberAttributeCode
+     * @param CompanyRepositoryInterface           $companyRepository
+     * @param Gateway                              $gateway
+     * @param CompanySearchRequestInterfaceFactory $companySearchRequestFactory
+     * @param Logger                               $logger
+     * @param string|null                          $regNumberAttributeCode
      */
     public function __construct(
         CompanyRepositoryInterface $companyRepository,
         Gateway $gateway,
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
+        Logger $logger,
         ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
         $this->gateway = $gateway;
         $this->companySearchRequestFactory = $companySearchRequestFactory;
+        $this->logger = $logger;
         $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
     }
 
     /**
      * Match Hokodo company after company is saved.
      *
-     * @param \Magento\Company\Model\ResourceModel\Company $subject
-     * @param \Magento\Company\Model\ResourceModel\Company $result
-     * @param \Magento\Company\Model\Company               $company
+     * @param MagentoCompanyResource $subject
+     * @param MagentoCompanyResource $result
+     * @param MagentoCompanyModel    $company
      *
-     * @return \Magento\Company\Model\ResourceModel\Company
+     * @return MagentoCompanyResource
      */
     public function afterSave(
         MagentoCompanyResource $subject,
@@ -87,7 +98,7 @@ class Company
     /**
      * Get Hokodo API company.
      *
-     * @param \Magento\Company\Model\Company $company
+     * @param MagentoCompanyModel $company
      *
      * @return \Hokodo\BNPL\Gateway\Command\Result\Company|null
      */
@@ -98,11 +109,19 @@ class Company
         $searchRequest
             ->setCountry($company->getCountryId())
             ->setRegNumber($company->getData($this->regNumberAttributeCode));
-        if ($list = $this->gateway->search($searchRequest)->getList()) {
-            return reset($list);
+        try {
+            if ($list = $this->gateway->search($searchRequest)->getList()) {
+                return reset($list);
+            }
+        } catch (NotFoundException|CommandException $e) {
+            $data = [
+                'message' => __('Can not find company. %1', $e->getMessage()),
+            ];
+            $data = array_merge($data, $company->getData());
+            $this->logger->warning(__METHOD__, $data);
         }
 
-        //TODO add logger
+        $this->logger->debug(__METHOD__, $company->getData());
         return null;
     }
 }
