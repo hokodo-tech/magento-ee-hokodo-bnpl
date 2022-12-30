@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
+ */
 
 declare(strict_types=1);
 
@@ -10,6 +14,8 @@ use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Psr\Log\LoggerInterface as Logger;
 
 class CompanyRepository implements CompanyRepositoryInterface
 {
@@ -39,6 +45,11 @@ class CompanyRepository implements CompanyRepositoryInterface
     private CompanyManagementInterface $companyManagement;
 
     /**
+     * @var Logger
+     */
+    private Logger $logger;
+
+    /**
      * CompanyRepository constructor.
      *
      * @param DataObjectHelper           $dataObjectHelper
@@ -46,19 +57,22 @@ class CompanyRepository implements CompanyRepositoryInterface
      * @param CompanyResource            $companyResource
      * @param CompanyInterfaceFactory    $companyInterfaceFactory
      * @param CompanyManagementInterface $companyManagement
+     * @param Logger                     $logger
      */
     public function __construct(
         DataObjectHelper $dataObjectHelper,
         CompanyFactory $companyFactory,
         CompanyResource $companyResource,
         CompanyInterfaceFactory $companyInterfaceFactory,
-        CompanyManagementInterface $companyManagement
+        CompanyManagementInterface $companyManagement,
+        Logger $logger
     ) {
         $this->dataObjectHelper = $dataObjectHelper;
         $this->companyFactory = $companyFactory;
         $this->companyResource = $companyResource;
         $this->companyInterfaceFactory = $companyInterfaceFactory;
         $this->companyManagement = $companyManagement;
+        $this->logger = $logger;
     }
 
     /**
@@ -101,10 +115,17 @@ class CompanyRepository implements CompanyRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function save(CompanyInterface $company): CompanyInterface
+    public function save(CompanyInterface $company): void
     {
         $companyModel = $this->companyFactory->create();
-        $this->companyResource->save($companyModel->setData($company->getData()));
-        return $companyModel;
+        try {
+            $this->companyResource->save($companyModel->setData($company->getData()));
+        } catch (AlreadyExistsException $e) {
+            $data = [
+                'message' => __('Error, the company has not been saved. %1', $e->getMessage()),
+            ];
+            $data = array_merge($data, $company->getData());
+            $this->logger->error(__METHOD__, $data);
+        }
     }
 }

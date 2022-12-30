@@ -20,7 +20,7 @@ interface CompanyRepositoryInterface extends HokodoEntityRepositoryInterface
      *
      * @return CompanyInterface
      */
-    public function save(CompanyInterface $company): CompanyInterface;
+    public function save(CompanyInterface $company): void;
 
     /**
      * Get Company by entity id.

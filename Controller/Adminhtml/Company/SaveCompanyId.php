@@ -1,4 +1,10 @@
 <?php
+/**
+ * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Controller\Adminhtml\Company;
 
@@ -15,49 +21,56 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Psr\Log\LoggerInterface as Logger;
 
 class SaveCompanyId extends Action implements HttpPostActionInterface
 {
     /**
-     * @var \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface
+     * @var CompanyRepositoryInterface
      */
     private CompanyRepositoryInterface $companyRepository;
 
     /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var CartRepositoryInterface
      */
     private CartRepositoryInterface $cartRepository;
 
     /**
-     * @var \Magento\Customer\Api\SessionCleanerInterface
+     * @var SessionCleanerInterface
      */
     private SessionCleanerInterface $sessionCleaner;
 
     /**
-     * @var \Magento\CompanyGraphQl\Model\Company\Users
+     * @var CompanyUsers
      */
     private CompanyUsers $companyUsers;
 
     /**
-     * @var \Magento\Company\Api\CompanyRepositoryInterface
+     * @var MagentoCompanyRepositoryInterface
      */
     private MagentoCompanyRepositoryInterface $magentoCompanyRepository;
 
     /**
-     * @var \Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface
+     * @var HokodoQuoteRepositoryInterface
      */
     private HokodoQuoteRepositoryInterface $hokodoQuoteRepository;
 
     /**
+     * @var Logger
+     */
+    private Logger $logger;
+
+    /**
      * SaveCompanyId constructor.
      *
-     * @param \Magento\Backend\App\Action\Context                 $context
-     * @param \Hokodo\BnplCommerce\Api\CompanyRepositoryInterface $companyRepository
-     * @param \Magento\Quote\Api\CartRepositoryInterface          $cartRepository
-     * @param \Magento\Customer\Api\SessionCleanerInterface       $sessionCleaner
-     * @param \Magento\CompanyGraphQl\Model\Company\Users         $companyUsers
-     * @param \Magento\Company\Api\CompanyRepositoryInterface     $magentoCompanyRepository
-     * @param \Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface     $hokodoQuoteRepository
+     * @param Context                           $context
+     * @param CompanyRepositoryInterface        $companyRepository
+     * @param CartRepositoryInterface           $cartRepository
+     * @param SessionCleanerInterface           $sessionCleaner
+     * @param CompanyUsers                      $companyUsers
+     * @param MagentoCompanyRepositoryInterface $magentoCompanyRepository
+     * @param HokodoQuoteRepositoryInterface    $hokodoQuoteRepository
+     * @param Logger                            $logger
      */
     public function __construct(
         Context $context,
@@ -66,7 +79,8 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         SessionCleanerInterface $sessionCleaner,
         CompanyUsers $companyUsers,
         MagentoCompanyRepositoryInterface $magentoCompanyRepository,
-        HokodoQuoteRepositoryInterface $hokodoQuoteRepository
+        HokodoQuoteRepositoryInterface $hokodoQuoteRepository,
+        Logger $logger
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -75,12 +89,13 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         $this->companyUsers = $companyUsers;
         $this->magentoCompanyRepository = $magentoCompanyRepository;
         $this->hokodoQuoteRepository = $hokodoQuoteRepository;
+        $this->logger = $logger;
     }
 
     /**
      * Execute action based on request and return result.
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute(): ResultInterface
     {
@@ -97,9 +112,15 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             if (!$hokodoCompany->getId()) {
                 $hokodoCompany->setId($entityId);
             }
+            $oldCompanyId = $hokodoCompany->getCompanyId();
             $hokodoCompany->setCompanyId($companyId);
 
             try {
+                $data = [
+                    'entityId' => $entityId,
+                    'companyId' => $companyId,
+                    'oldCompanyId' => $oldCompanyId,
+                ];
                 foreach ($this->getCompanyUsers($entityId) as $user) {
                     $this->resetUserCartSession($user);
                 }
@@ -108,11 +129,17 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
                     'success' => true,
                     'message' => __('Success, the company was successfully saved.'),
                 ];
+
+                $data = array_merge($data, $result);
+                $this->logger->debug(__METHOD__, $data);
             } catch (\Exception $e) {
                 $result = [
                     'success' => false,
                     'message' => __('Error, the company has not been updated. %1', $e->getMessage()),
                 ];
+
+                $data = array_merge($data, $result);
+                $this->logger->error(__METHOD__, $data);
             }
         }
 
@@ -126,7 +153,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
      *
      * @return array
      *
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     private function getCompanyUsers(int $entityId): array
     {
@@ -139,7 +166,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     /**
      * Reset user's session if the companyId changed.
      *
-     * @param \Magento\Customer\Api\Data\CustomerInterface $user
+     * @param CustomerInterface $user
      *
      * @return void
      */
@@ -154,7 +181,13 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
                 }
                 $this->sessionCleaner->clearFor($user->getId());
             }
-        } catch (NoSuchEntityException $e) { // @codingStandardsIgnoreLine
-        } // @codingStandardsIgnoreLine
+        } catch (NoSuchEntityException $e) {
+            $data = [
+                'userId' => $user->getId(),
+                'message' => __('Can not reset session if the companyId changed for user %1', $user->getId()),
+                'error' => $e->getMessage(),
+            ];
+            $this->logger->error(__METHOD__, $data);
+        }
     }
 }

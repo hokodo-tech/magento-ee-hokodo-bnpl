@@ -62,4 +62,21 @@
             </argument>
         </arguments>
     </type>
+    <!-- Logger section start -->
+    <type name="Hokodo\BnplCommerce\Controller\Adminhtml\Company\SaveCompanyId">
+        <arguments>
+            <argument name="logger" xsi:type="object">HokodoLogger</argument>
+        </arguments>
+    </type>
+    <type name="Hokodo\BnplCommerce\Model\CompanyRepository">
+        <arguments>
+            <argument name="logger" xsi:type="object">HokodoLogger</argument>
+        </arguments>
+    </type>
+    <type name="Hokodo\BnplCommerce\Plugin\Company\ResourceModel\Company">
+        <arguments>
+            <argument name="logger" xsi:type="object">HokodoLogger</argument>
+        </arguments>
+    </type>
+    <!-- Logger section end -->
 </config>

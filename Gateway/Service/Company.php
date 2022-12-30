@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
  */
 
 declare(strict_types=1);
@@ -10,6 +10,8 @@ namespace Hokodo\BnplCommerce\Gateway\Service;
 
 use Hokodo\BNPL\Gateway\Service\AbstractService;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Command\ResultInterface;
 
 class Company extends AbstractService
@@ -17,12 +19,12 @@ class Company extends AbstractService
     /**
      * API search payment gateway command.
      *
-     * @param \Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface $request
+     * @param CompanySearchRequestInterface $request
      *
-     * @return \Magento\Payment\Gateway\Command\ResultInterface
+     * @return ResultInterface
      *
-     * @throws \Magento\Framework\Exception\NotFoundException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws NotFoundException
+     * @throws CommandException
      */
     public function search(CompanySearchRequestInterface $request): ResultInterface
     {
