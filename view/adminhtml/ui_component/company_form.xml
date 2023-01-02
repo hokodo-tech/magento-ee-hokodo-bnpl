@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd" component="Magento_CompanyCredit/js/form/form">
-    <fieldset name="hokodo" sortOrder="999" class="Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset">
+    <fieldset name="hokodo" sortOrder="999">
         <settings>
             <collapsible>true</collapsible>
             <label translate="true">Hokodo</label>
@@ -17,7 +17,7 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <visible>true</visible>
+                <visible>false</visible>
             </settings>
         </field>
     </fieldset>
