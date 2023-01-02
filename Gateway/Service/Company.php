@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Gateway\Service;
 
 use Hokodo\BNPL\Gateway\Service\AbstractService;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Payment\Gateway\Command\CommandException;
@@ -29,5 +30,20 @@ class Company extends AbstractService
     public function search(CompanySearchRequestInterface $request): ResultInterface
     {
         return $this->commandPool->get('hokodo_company_search')->execute($request->__toArray());
+    }
+
+    /**
+     * Get company Credit object from Hokodo API.
+     *
+     * @param CompanyCreditRequestInterface $request
+     *
+     * @return ResultInterface
+     *
+     * @throws NotFoundException
+     * @throws CommandException
+     */
+    public function getCredit(CompanyCreditRequestInterface $request): ResultInterface
+    {
+        return $this->commandPool->get('hokodo_company_credit')->execute($request->__toArray());
     }
 }

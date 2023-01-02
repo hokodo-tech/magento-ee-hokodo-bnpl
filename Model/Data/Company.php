@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Model\Data;
 
+use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Magento\Framework\DataObject;
 
@@ -104,6 +105,23 @@ class Company extends DataObject implements CompanyInterface
     public function setOrganisationId(?string $organisationId): self
     {
         $this->setData(self::ORGANISATION_ID, $organisationId);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCreditLimit(): ?CreditLimitInterface
+    {
+        return $this->getData(self::CREDIT_LIMIT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCreditLimit(?CreditLimitInterface $creditLimit): self
+    {
+        $this->setData(self::CREDIT_LIMIT, $creditLimit);
         return $this;
     }
 }

@@ -1,16 +1,20 @@
 {
-  "hokodo_company": {
-    "column": {
-      "id": true,
-      "entity_id": true,
-      "company_id": true,
-      "organisation_id": true
-    },
-    "index": {
-      "HOKODO_COMPANY_ID": true
-    },
-    "constraint": {
-      "PRIMARY": true
+    "hokodo_company": {
+        "column": {
+            "id": true,
+            "entity_id": true,
+            "company_id": true,
+            "organisation_id": true,
+            "credit": true,
+            "credit_limit": true
+        },
+        "index": {
+            "HOKODO_COMPANY_ID": true,
+            "HOKODO_COMPANY_ENTITY_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "HOKODO_COMPANY_ENTITY_ID_COMPANY_ENTITY_ID": true
+        }
     }
-  }
 }

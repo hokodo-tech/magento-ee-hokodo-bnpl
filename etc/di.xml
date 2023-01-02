@@ -62,6 +62,54 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Company Credit Limit -->
+    <preference for="Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface" type="Hokodo\BnplCommerce\Model\Data\Gateway\CompanyCreditRequest" />
+    <preference for="Hokodo\BnplCommerce\Api\Data\Company\CreditInterface" type="Hokodo\BnplCommerce\Model\Data\Company\Credit" />
+    <preference for="Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface" type="Hokodo\BnplCommerce\Model\Data\Company\CreditLimit" />
+
+    <virtualType name="Hokodo\BNPL\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="hokodo_company_credit" xsi:type="string">Hokodo\BnplCommerce\Gateway\Command\CompanyCredit</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Command\CompanyCredit" type="Hokodo\BNPL\Gateway\Command\HokodoGatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Hokodo\BnplCommerce\Gateway\Request\CompanyCredit\BuilderComposite</argument>
+            <argument name="resultFactory" xsi:type="object">Hokodo\BnplCommerce\Gateway\Command\CompanyCredit\ResultInterfaceFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanyCredit\BuilderComposite" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="api_key" xsi:type="string">Hokodo\BNPL\Gateway\Request\AuthorizationBuilder</item>
+                <item name="uri" xsi:type="string">Hokodo\BnplCommerce\Gateway\Request\CompanyCredit</item>
+                <item name="method" xsi:type="string">Hokodo\BNPL\Gateway\Request\PostMethodBuilder</item>
+                <item name="body" xsi:type="string">Hokodo\BnplCommerce\Gateway\Request\CompanyCreditEventBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanyCreditEventBuilder" type="Hokodo\BNPL\Gateway\Request\Sdk\GeneralSubjectBuilder">
+        <arguments>
+            <argument name="endpointBuilder" xsi:type="object">Hokodo\BnplCommerce\Gateway\Request\CompanyCredit</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Request\CompanyCredit" type="Hokodo\BNPL\Gateway\Request\Sdk\EndpointBuilder">
+        <arguments>
+            <argument name="endpoint" xsi:type="string">payment/credit_limits/company/:company_id</argument>
+            <argument name="params" xsi:type="array">
+                <item name=":company_id" xsi:type="string">company_id</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BnplCommerce\Gateway\Command\CompanyCredit\ResultInterfaceFactory" type="Magento\Payment\Gateway\Command\ResultInterfaceFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">\Hokodo\BnplCommerce\Gateway\Command\Result\CompanyCredit</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Logger section start -->
     <type name="Hokodo\BnplCommerce\Controller\Adminhtml\Company\SaveCompanyId">
         <arguments>

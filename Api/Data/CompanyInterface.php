@@ -3,6 +3,7 @@
 namespace Hokodo\BnplCommerce\Api\Data;
 
 use Hokodo\BNPL\Api\Data\HokodoEntityInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 
 interface CompanyInterface extends HokodoEntityInterface
 {
@@ -13,6 +14,7 @@ interface CompanyInterface extends HokodoEntityInterface
     public const ENTITY_ID = 'entity_id';
     public const COMPANY_ID = 'company_id';
     public const ORGANISATION_ID = 'organisation_id';
+    public const CREDIT_LIMIT = 'credit_limit';
 
     /**
      * Getter for Id.
@@ -77,4 +79,20 @@ interface CompanyInterface extends HokodoEntityInterface
      * @return $this
      */
     public function setOrganisationId(string $organisationId): self;
+
+    /**
+     * Credit Limit getter.
+     *
+     * @return \Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface|null
+     */
+    public function getCreditLimit(): ?CreditLimitInterface;
+
+    /**
+     * Credit Limit setter.
+     *
+     * @param \Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface|null $creditLimit
+     *
+     * @return $this
+     */
+    public function setCreditLimit(?CreditLimitInterface $creditLimit): self;
 }
