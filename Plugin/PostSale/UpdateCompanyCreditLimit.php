@@ -79,8 +79,8 @@ class UpdateCompanyCreditLimit
     public function afterExecute($subject, $result, array $commandSubject)
     {
         /* @var OrderInterface $order */
-        if ($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) {
-            $company = $this->companyManagement->getByCustomerId($customerId);
+        if (($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) &&
+            ($company = $this->companyManagement->getByCustomerId($customerId))) {
             $hokodoCompany = $this->companyRepository->getByEntityId($company->getId());
             if ($hokodoCompany->getEntityId()) {
                 $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($hokodoCompany->getCompanyId()));
