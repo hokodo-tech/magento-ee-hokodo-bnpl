@@ -11,6 +11,7 @@ use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Gateway\Service\Company;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Sales\Api\Data\OrderInterface;
