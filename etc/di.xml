@@ -127,4 +127,16 @@
         </arguments>
     </type>
     <!-- Logger section end -->
+    <type name="Hokodo\BNPL\Gateway\Command\PostSale\CapturePayment">
+        <plugin name="update_company_credit_limit_after_capture"
+                type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
+    </type>
+    <type name="Hokodo\BNPL\Gateway\Command\PostSale\RefundPayment">
+        <plugin name="update_company_credit_limit_after_refund"
+                type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
+    </type>
+    <type name="Hokodo\BNPL\Gateway\Command\PostSale\VoidPayment">
+        <plugin name="update_company_credit_limit_after_void"
+                type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
+    </type>
 </config>

@@ -14,8 +14,8 @@ use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
-use Psr\Log\LoggerInterface as Logger;
 use Magento\Framework\Serialize\SerializerInterface;
+use Psr\Log\LoggerInterface as Logger;
 
 class CompanyRepository implements CompanyRepositoryInterface
 {

@@ -1,22 +1,22 @@
 <?php
+
 declare(strict_types=1);
 
-namespace Hokodo\BnplCommerce\Observer\Checkout\Success;
+namespace Hokodo\BnplCommerce\Plugin\PostSale;
 
-use Hokodo\BNPL\Gateway\Config\Config;
+use Hokodo\BNPL\Gateway\Command\PostSale\CapturePayment;
+use Hokodo\BNPL\Gateway\Command\PostSale\RefundPayment;
+use Hokodo\BNPL\Gateway\Command\PostSale\VoidPayment;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Gateway\Service\Company;
 use Magento\Company\Api\CompanyManagementInterface;
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 
-class UpdateHokodoCompanyLimit implements ObserverInterface
+class UpdateCompanyCreditLimit
 {
     /**
      * @var CompanyManagementInterface
@@ -67,15 +67,18 @@ class UpdateHokodoCompanyLimit implements ObserverInterface
     }
 
     /**
-     * @param Observer $observer
+     * Update company's credit limit after successful post-sale command.
      *
-     * @return void
+     * @param CapturePayment|RefundPayment|VoidPayment $subject
+     * @param mixed                                    $result
+     * @param array                                    $commandSubject
+     *
+     * @return mixed
      */
-    public function execute(Observer $observer)
+    public function afterExecute($subject, $result, array $commandSubject)
     {
-        /** @var OrderInterface $order */
-        $order = $observer->getEvent()->getOrder();
-        if (($customerId = $order->getCustomerId()) && $order->getPayment()->getMethod() === Config::CODE) {
+        /* @var OrderInterface $order */
+        if ($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) {
             $company = $this->companyManagement->getByCustomerId($customerId);
             $hokodoCompany = $this->companyRepository->getByEntityId($company->getId());
             if ($hokodoCompany->getEntityId()) {
@@ -83,6 +86,8 @@ class UpdateHokodoCompanyLimit implements ObserverInterface
                 $this->companyRepository->save($hokodoCompany);
             }
         }
+
+        return $result;
     }
 
     /**
