@@ -11,8 +11,7 @@
         }
     ],
     "require": {
-        "magento/framework": "*",
-        "hokodo/magento-bnpl": "=>2.*|dev-master"
+        "hokodo/magento-bnpl": "dev-master"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "@stable",
