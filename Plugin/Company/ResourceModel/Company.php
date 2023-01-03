@@ -9,6 +9,7 @@ namespace Hokodo\BnplCommerce\Plugin\Company\ResourceModel;
 
 use Hokodo\BNPL\Api\Data\CompanyInterface as ApiCompany;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
@@ -151,7 +152,11 @@ class Company
         $searchRequest->setCompanyId($companyId);
 
         try {
-            return $this->gateway->getCredit($searchRequest)->getDataModel()->getCreditLimit();
+            /** @var CreditInterface $companyCredit */
+            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
+            if (!$companyCredit->getRejectionReason()) {
+                return $companyCredit->getCreditLimit();
+            }
         } catch (\Exception $e) {
             $data = [
                 'message' => 'Hokodo_BNPL: company credit call failed with error.',

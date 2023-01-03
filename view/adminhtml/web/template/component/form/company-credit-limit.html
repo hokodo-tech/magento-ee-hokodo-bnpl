@@ -1,0 +1,32 @@
+<ul class="credit-balance-list" data-role="credit-balance" style="margin-bottom: 40px;">
+    <li class="credit-balance-item">
+        <p class="credit-balance-label" data-bind="i18n: 'Eligible'"></p>
+        <span class="credit-balance-price">
+            <!-- ko text: source.data.hokodo.credit_limit ? 'Yes' : 'No' -->
+            <!-- /ko -->
+        </span>
+    </li>
+    <!-- ko if: source.data.hokodo.credit_limit -->
+    <li class="credit-balance-item">
+        <p class="credit-balance-label" data-bind="i18n: 'Amount'"></p>
+        <span class="credit-balance-price">
+            <!-- ko text: getFormattedAmount(source.data.hokodo.credit_limit.amount) -->
+            <!-- /ko -->
+        </span>
+    </li>
+    <li class="credit-balance-item">
+        <p class="credit-balance-label" data-bind="i18n: 'Amount in use'"></p>
+        <span class="credit-balance-price">
+            <!-- ko text: getFormattedAmount(source.data.hokodo.credit_limit.amount_in_use) -->
+            <!-- /ko -->
+        </span>
+    </li>
+    <li class="credit-balance-item">
+        <p class="credit-balance-label" data-bind="i18n: 'Amount available'"></p>
+        <span class="credit-balance-price">
+            <!-- ko text: getFormattedAmount(source.data.hokodo.credit_limit.amount_available) -->
+            <!-- /ko -->
+        </span>
+    </li>
+    <!-- /ko -->
+</ul>
