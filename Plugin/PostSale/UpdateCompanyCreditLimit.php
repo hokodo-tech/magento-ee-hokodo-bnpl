@@ -78,14 +78,23 @@ class UpdateCompanyCreditLimit
      */
     public function afterExecute($subject, $result, array $commandSubject)
     {
-        /* @var OrderInterface $order */
-        if (($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) &&
-            ($company = $this->companyManagement->getByCustomerId($customerId))) {
-            $hokodoCompany = $this->companyRepository->getByEntityId($company->getId());
-            if ($hokodoCompany->getEntityId()) {
-                $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($hokodoCompany->getCompanyId()));
-                $this->companyRepository->save($hokodoCompany);
+        // Adding try/catch to avoid code failing on successful post sale event.
+        try {
+            /* @var OrderInterface $order */
+            if (($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) &&
+                ($company = $this->companyManagement->getByCustomerId($customerId))) {
+                $hokodoCompany = $this->companyRepository->getByEntityId((int) $company->getId());
+                if ($hokodoCompany->getEntityId()) {
+                    $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($hokodoCompany->getCompanyId()));
+                    $this->companyRepository->save($hokodoCompany);
+                }
             }
+        } catch (\Exception $e) {
+            $data = [
+                'message' => 'Hokodo_BNPL: company credit update failed with error on ' . gettype($subject),
+                'error' => $e->getMessage(),
+            ];
+            $this->logger->debug(__METHOD__, $data);
         }
 
         return $result;
