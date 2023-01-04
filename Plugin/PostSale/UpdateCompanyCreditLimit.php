@@ -91,6 +91,7 @@ class UpdateCompanyCreditLimit
             }
         } catch (\Exception $e) {
             $data = [
+                //@codingStandardsIgnoreLine
                 'message' => 'Hokodo_BNPL: company credit update failed with error on ' . gettype($subject),
                 'error' => $e->getMessage(),
             ];
