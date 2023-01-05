@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <hokodo_bnpl>
+                <advanced>
+                    <entity_level>company</entity_level>
+                </advanced>
+            </hokodo_bnpl>
+        </payment>
+    </default>
+</config>

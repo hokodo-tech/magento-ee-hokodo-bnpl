@@ -9,6 +9,7 @@ namespace Hokodo\BnplCommerce\Plugin\BNPL\Ui\Component\Customer\Form;
 
 use Hokodo\BNPL\Gateway\Config\Config;
 use Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset;
+use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
 
 class HokodoFieldsetPlugin
 {
@@ -36,9 +37,6 @@ class HokodoFieldsetPlugin
      */
     public function afterIsComponentVisible(HokodoFieldset $subject, $result): bool
     {
-        if ($this->config->getEntityLevel() === Config::HOKODO_ENTITY_FOR_SAVE_COMPANY_LEVEL_IN_COMPANY) {
-            return false;
-        }
-        return $result;
+        return $this->config->getEntityLevel() === EntityLevelForSave::CUSTOMER;
     }
 }

@@ -15,7 +15,7 @@
                            showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                         <label>Instance where Company Info stored</label>
                         <comment><![CDATA[Pay attention this setting can not be changed.]]></comment>
-                        <source_model>Hokodo\BnplCommerce\Model\Source\EntityForSave\EntityLevel</source_model>
+                        <source_model>Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave</source_model>
                         <frontend_model>Hokodo\BnplCommerce\Block\Adminhtml\System\Config\Disable</frontend_model>
                     </field>
                 </group>

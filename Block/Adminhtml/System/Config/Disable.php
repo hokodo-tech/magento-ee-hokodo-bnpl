@@ -22,8 +22,7 @@ class Disable extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        //TODO Uncomment before going live
-//        $element->setDisabled('disabled');
+        $element->setDisabled('disabled');
         return $element->getElementHtml();
     }
 }
