@@ -12,7 +12,6 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class EntityLevelForSave implements OptionSourceInterface
 {
-    public const CUSTOMER = 'customer';
     public const COMPANY = 'company';
 
     /**
@@ -24,7 +23,7 @@ class EntityLevelForSave implements OptionSourceInterface
     {
         return [
             [
-                'value' => self::CUSTOMER,
+                'value' => \Hokodo\BNPL\Model\Config\Source\EntityLevelForSave::CUSTOMER,
                 'label' => __('Customer'),
             ],
             [
