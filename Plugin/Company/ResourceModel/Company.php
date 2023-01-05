@@ -9,6 +9,10 @@ namespace Hokodo\BnplCommerce\Plugin\Company\ResourceModel;
 
 use Hokodo\BNPL\Api\Data\CompanyInterface as ApiCompany;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Gateway\Service\Company as Gateway;
@@ -16,7 +20,7 @@ use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Payment\Gateway\Command\CommandException;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 
 class Company
 {
@@ -43,9 +47,14 @@ class Company
     private CompanySearchRequestInterfaceFactory $companySearchRequestFactory;
 
     /**
-     * @var Logger
+     * @var CompanyCreditRequestInterfaceFactory
      */
-    private Logger $logger;
+    private CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory;
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     /**
      * Company constructor.
@@ -53,19 +62,22 @@ class Company
      * @param CompanyRepositoryInterface           $companyRepository
      * @param Gateway                              $gateway
      * @param CompanySearchRequestInterfaceFactory $companySearchRequestFactory
-     * @param Logger                               $logger
+     * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
+     * @param LoggerInterface                      $logger
      * @param string|null                          $regNumberAttributeCode
      */
     public function __construct(
         CompanyRepositoryInterface $companyRepository,
         Gateway $gateway,
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
-        Logger $logger,
+        CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
+        LoggerInterface $logger,
         ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
         $this->gateway = $gateway;
         $this->companySearchRequestFactory = $companySearchRequestFactory;
+        $this->companyCreditRequestFactory = $companyCreditRequestFactory;
         $this->logger = $logger;
         $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
     }
@@ -88,7 +100,8 @@ class Company
         if (!$hokodoCompany->getId() && ($apiCompany = $this->getHokodoApiCompany($company))) {
             $hokodoCompany
                 ->setEntityId((int) $company->getEntityId())
-                ->setCompanyId($apiCompany->getId());
+                ->setCompanyId($apiCompany->getId())
+                ->setCreditLimit($this->getCompanyCreditLimit($apiCompany->getId()));
             $this->companyRepository->save($hokodoCompany);
         }
 
@@ -100,7 +113,7 @@ class Company
      *
      * @param MagentoCompanyModel $company
      *
-     * @return \Hokodo\BNPL\Gateway\Command\Result\Company|null
+     * @return ApiCompany|null
      */
     private function getHokodoApiCompany(MagentoCompanyModel $company): ?ApiCompany
     {
@@ -122,6 +135,36 @@ class Company
         }
 
         $this->logger->debug(__METHOD__, $company->getData());
+        return null;
+    }
+
+    /**
+     * Get company credit limit.
+     *
+     * @param string $companyId
+     *
+     * @return CreditLimitInterface|null
+     */
+    private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
+    {
+        /** @var CompanyCreditRequestInterface $searchRequest */
+        $searchRequest = $this->companyCreditRequestFactory->create();
+        $searchRequest->setCompanyId($companyId);
+
+        try {
+            /** @var CreditInterface $companyCredit */
+            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
+            if (!$companyCredit->getRejectionReason()) {
+                return $companyCredit->getCreditLimit();
+            }
+        } catch (\Exception $e) {
+            $data = [
+                'message' => 'Hokodo_BNPL: company credit call failed with error.',
+                'error' => $e->getMessage(),
+            ];
+            $this->logger->error(__METHOD__, $data);
+        }
+
         return null;
     }
 }

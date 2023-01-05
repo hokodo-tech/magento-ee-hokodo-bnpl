@@ -10,6 +10,11 @@ namespace Hokodo\BnplCommerce\Controller\Adminhtml\Company;
 
 use Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
+use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
+use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
+use Hokodo\BnplCommerce\Gateway\Service\Company;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Company\Api\CompanyRepositoryInterface as MagentoCompanyRepositoryInterface;
@@ -21,7 +26,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 
 class SaveCompanyId extends Action implements HttpPostActionInterface
 {
@@ -56,21 +61,33 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     private HokodoQuoteRepositoryInterface $hokodoQuoteRepository;
 
     /**
-     * @var Logger
+     * @var CompanyCreditRequestInterfaceFactory
      */
-    private Logger $logger;
+    private CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory;
+
+    /**
+     * @var Company
+     */
+    private Company $gateway;
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     /**
      * SaveCompanyId constructor.
      *
-     * @param Context                           $context
-     * @param CompanyRepositoryInterface        $companyRepository
-     * @param CartRepositoryInterface           $cartRepository
-     * @param SessionCleanerInterface           $sessionCleaner
-     * @param CompanyUsers                      $companyUsers
-     * @param MagentoCompanyRepositoryInterface $magentoCompanyRepository
-     * @param HokodoQuoteRepositoryInterface    $hokodoQuoteRepository
-     * @param Logger                            $logger
+     * @param Context                              $context
+     * @param CompanyRepositoryInterface           $companyRepository
+     * @param CartRepositoryInterface              $cartRepository
+     * @param SessionCleanerInterface              $sessionCleaner
+     * @param CompanyUsers                         $companyUsers
+     * @param MagentoCompanyRepositoryInterface    $magentoCompanyRepository
+     * @param HokodoQuoteRepositoryInterface       $hokodoQuoteRepository
+     * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
+     * @param Company                              $gateway
+     * @param LoggerInterface                      $logger
      */
     public function __construct(
         Context $context,
@@ -80,7 +97,9 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         CompanyUsers $companyUsers,
         MagentoCompanyRepositoryInterface $magentoCompanyRepository,
         HokodoQuoteRepositoryInterface $hokodoQuoteRepository,
-        Logger $logger
+        CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
+        Company $gateway,
+        LoggerInterface $logger
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -89,6 +108,8 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         $this->companyUsers = $companyUsers;
         $this->magentoCompanyRepository = $magentoCompanyRepository;
         $this->hokodoQuoteRepository = $hokodoQuoteRepository;
+        $this->companyCreditRequestFactory = $companyCreditRequestFactory;
+        $this->gateway = $gateway;
         $this->logger = $logger;
     }
 
@@ -114,6 +135,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             }
             $oldCompanyId = $hokodoCompany->getCompanyId();
             $hokodoCompany->setCompanyId($companyId);
+            $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($companyId));
 
             try {
                 $data = [
@@ -189,5 +211,35 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             ];
             $this->logger->error(__METHOD__, $data);
         }
+    }
+
+    /**
+     * Get company credit limit.
+     *
+     * @param string $companyId
+     *
+     * @return CreditLimitInterface|null
+     */
+    private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
+    {
+        /** @var CompanyCreditRequestInterface $searchRequest */
+        $searchRequest = $this->companyCreditRequestFactory->create();
+        $searchRequest->setCompanyId($companyId);
+
+        try {
+            /** @var CreditInterface $companyCredit */
+            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
+            if (!$companyCredit->getRejectionReason()) {
+                return $companyCredit->getCreditLimit();
+            }
+        } catch (\Exception $e) {
+            $data = [
+                'message' => 'Hokodo_BNPL: company credit call failed with error.',
+                'error' => $e->getMessage(),
+            ];
+            $this->logger->error(__METHOD__, $data);
+        }
+
+        return null;
     }
 }

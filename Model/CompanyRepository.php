@@ -14,7 +14,7 @@ use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface as Logger;
 
 class CompanyRepository implements CompanyRepositoryInterface
@@ -50,6 +50,11 @@ class CompanyRepository implements CompanyRepositoryInterface
     private Logger $logger;
 
     /**
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    /**
      * CompanyRepository constructor.
      *
      * @param DataObjectHelper           $dataObjectHelper
@@ -58,6 +63,7 @@ class CompanyRepository implements CompanyRepositoryInterface
      * @param CompanyInterfaceFactory    $companyInterfaceFactory
      * @param CompanyManagementInterface $companyManagement
      * @param Logger                     $logger
+     * @param SerializerInterface        $serializer
      */
     public function __construct(
         DataObjectHelper $dataObjectHelper,
@@ -65,7 +71,8 @@ class CompanyRepository implements CompanyRepositoryInterface
         CompanyResource $companyResource,
         CompanyInterfaceFactory $companyInterfaceFactory,
         CompanyManagementInterface $companyManagement,
-        Logger $logger
+        Logger $logger,
+        SerializerInterface $serializer
     ) {
         $this->dataObjectHelper = $dataObjectHelper;
         $this->companyFactory = $companyFactory;
@@ -73,6 +80,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         $this->companyInterfaceFactory = $companyInterfaceFactory;
         $this->companyManagement = $companyManagement;
         $this->logger = $logger;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -84,6 +92,9 @@ class CompanyRepository implements CompanyRepositoryInterface
         $companyDO = $this->companyInterfaceFactory->create();
 
         $this->companyResource->load($companyModel, $entityId, CompanyInterface::ENTITY_ID);
+        if ($creditLimitJson = $companyModel->getData(CompanyInterface::CREDIT_LIMIT)) {
+            $companyModel->setData(CompanyInterface::CREDIT_LIMIT, $this->serializer->unserialize($creditLimitJson));
+        }
         $this->dataObjectHelper->populateWithArray($companyDO, $companyModel->getData(), CompanyInterface::class);
 
         return $companyDO;
@@ -118,14 +129,14 @@ class CompanyRepository implements CompanyRepositoryInterface
     public function save(CompanyInterface $company): void
     {
         $companyModel = $this->companyFactory->create();
-        try {
-            $this->companyResource->save($companyModel->setData($company->getData()));
-        } catch (AlreadyExistsException $e) {
-            $data = [
-                'message' => __('Error, the company has not been saved. %1', $e->getMessage()),
-            ];
-            $data = array_merge($data, $company->getData());
-            $this->logger->error(__METHOD__, $data);
+        if ($entityId = $company->getEntityId()) {
+            $this->companyResource->load($companyModel, $entityId);
         }
+        $companyModel->setData($company->getData());
+        if ($creditLimit = $company->getCreditLimit()) {
+            $companyModel->setData(CompanyInterface::CREDIT_LIMIT, $creditLimit->toJson());
+        }
+
+        $this->companyResource->save($companyModel);
     }
 }

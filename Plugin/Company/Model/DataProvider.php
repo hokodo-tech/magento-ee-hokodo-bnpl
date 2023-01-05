@@ -58,8 +58,9 @@ class DataProvider
             }
         }
         $result['hokodo'] = [
-            'company_id' => $hokodoCompanyId,
+            'company_id' => $hokodoCompanyId ?: '',
             'submit_url' => $this->urlBuilder->getUrl('hokodo_commerce/company/savecompanyid'),
+            'credit_limit' => $company->getCreditLimit() ? $company->getCreditLimit()->getData() : null,
         ];
         return $result;
     }

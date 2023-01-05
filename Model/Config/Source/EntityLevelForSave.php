@@ -6,13 +6,15 @@
 
 declare(strict_types=1);
 
-namespace Hokodo\BnplCommerce\Model\Source\EntityForSave;
+namespace Hokodo\BnplCommerce\Model\Config\Source;
 
-use Hokodo\BNPL\Gateway\Config\Config;
 use Magento\Framework\Data\OptionSourceInterface;
 
-class EntityLevel implements OptionSourceInterface
+class EntityLevelForSave implements OptionSourceInterface
 {
+    public const CUSTOMER = 'customer';
+    public const COMPANY = 'company';
+
     /**
      * Get Options Array.
      *
@@ -22,11 +24,11 @@ class EntityLevel implements OptionSourceInterface
     {
         return [
             [
-                'value' => Config::HOKODO_ENTITY_FOR_SAVE_COMPANY_LEVEL_IN_CUSTOMER,
+                'value' => self::CUSTOMER,
                 'label' => __('Customer'),
             ],
             [
-                'value' => Config::HOKODO_ENTITY_FOR_SAVE_COMPANY_LEVEL_IN_COMPANY,
+                'value' => self::COMPANY,
                 'label' => __('Company'),
             ],
         ];
