@@ -8,11 +8,12 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Plugin\Customer\Block\Account;
 
 use Hokodo\BNPL\Gateway\Config\Config;
+use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
 use Magento\Customer\Block\Account\Navigation;
 
 class NavigationPlugin
 {
-    public const PATHS_TO_REMOVE = [
+    public const PATH_TO_REMOVE = [
         'hokodo_bnpl/customer',
     ];
 
@@ -40,13 +41,13 @@ class NavigationPlugin
      */
     public function afterGetLinks(Navigation $subject, $result): array
     {
-        if ($this->config->getEntityLevel() === Config::HOKODO_ENTITY_FOR_SAVE_COMPANY_LEVEL_IN_COMPANY) {
+        if ($this->config->getEntityLevel() === EntityLevelForSave::COMPANY) {
             foreach ($result as $key => $link) {
                 if (!$link->getData('path')) {
                     continue;
                 }
 
-                if (in_array($link->getData('path'), self::PATHS_TO_REMOVE)) {
+                if (in_array($link->getData('path'), self::PATH_TO_REMOVE)) {
                     unset($result[$key]);
                 }
             }
