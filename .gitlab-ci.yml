@@ -170,44 +170,47 @@ test:e2e:
   #   expire_in: 1 week
   #   when: on_failure
 
-# ======= DEPLOYMENT =======
-#.deploy:
-#  extends: .ssh-client
-#  stage: deploy
-##  needs:
-##    - test:unit
-#  variables:
-#    PHP_VERSION: "8.1"
-#    PHP_CLI: php$PHP_VERSION
-#  script:
-#    - ssh "magento@$SSH_HOST" "cd $SSH_PATH/app/code/ && rm -rf * && mkdir -p Hokodo/BNPL/"
-#    - scp -r * "magento@$SSH_HOST:$SSH_PATH/app/code/Hokodo/BnplCommerce/"
-#    - ssh "magento@$SSH_HOST"
-#      "cd $SSH_PATH &&
-#      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/active 1 &&
-#      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/environment '$HOKODO_ENV'&&
-#      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/${HOKODO_ENV}_api_key '$HOKODO_API_KEY_SANDBOX' &&
-#      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/${HOKODO_ENV}_sdk_key '$HOKODO_SDK_KEY_SANDBOX'"
-#    # Magento commands: setup:upgrade => setup:di:compile => setup:static-content:deploy => cache:flush
-#    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI bin/magento se:up && $PHP_CLI bin/magento se:d:c && $PHP_CLI bin/magento se:s:d && $PHP_CLI bin/magento c:f"
-#
-#.deploy-dev:
-#  extends: .deploy
-#  variables:
-#    SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY_DEV
-#    SSH_HOST:        $SSH_HOST_DEV
-#    SSH_PATH:        ~/public_html
-#    HOKODO_ENV:      sandbox
-#    HOKODO_API_KEY:  $HOKODO_API_KEY_SANDBOX
-#  resource_group: deploy-dev
-#
-#deploy:dev:
-#  extends: .deploy-dev
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-#deploy:dev:manual:
-#  extends: .deploy-dev
-#  rules:
-#    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
-#  when: manual
+## ======= DEPLOYMENT =======
+.deploy:
+  extends: .ssh-client
+  stage: deploy
+#  needs:
+#    - test:unit
+  variables:
+    PHP_VERSION: "8.1"
+    PHP_CLI: php$PHP_VERSION
+    COMPOSER_CLI: composer
+  script:
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH/app/code/ && rm -rf * && mkdir -p Hokodo/BnplCommerce/"
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && rm -rf vendor/hokodo"
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI /usr/local/bin/$COMPOSER_CLI install"
+    - scp -r * "magento@$SSH_HOST:$SSH_PATH/app/code/Hokodo/BnplCommerce/"
+    - ssh "magento@$SSH_HOST"
+      "cd $SSH_PATH &&
+      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/active 1 &&
+      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/environment '$HOKODO_ENV'&&
+      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/${HOKODO_ENV}_api_key '$HOKODO_API_KEY_SANDBOX' &&
+      $PHP_CLI bin/magento config:set --lock-env payment/hokodo_bnpl/${HOKODO_ENV}_sdk_key '$HOKODO_SDK_KEY_SANDBOX'"
+    # Magento commands: setup:upgrade => setup:di:compile => setup:static-content:deploy => cache:flush
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI bin/magento se:up && $PHP_CLI bin/magento se:d:c && $PHP_CLI bin/magento se:s:d && $PHP_CLI bin/magento c:f"
+
+.deploy-dev:
+  extends: .deploy
+  variables:
+    SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY_DEV
+    SSH_HOST:        $SSH_HOST_DEV
+    SSH_PATH:        ~/public_html_ee
+    HOKODO_ENV:      sandbox
+    HOKODO_API_KEY:  $HOKODO_API_KEY_SANDBOX
+  resource_group: deploy-dev
+
+deploy:dev:
+  extends: .deploy-dev
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy:dev:manual:
+  extends: .deploy-dev
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+  when: manual
