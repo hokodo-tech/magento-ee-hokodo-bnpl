@@ -46,7 +46,7 @@ php:compat:
   extends: .ssh-client
   stage: test
   variables:
-    REVIEW_INSTANCE: magento_${CI_MERGE_REQUEST_IID}_ee
+    REVIEW_INSTANCE: magento_ee_$CI_MERGE_REQUEST_IID
     SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY_DEV
     SSH_HOST:        $SSH_HOST_DEV
     SSH_PATH:        /var/www/$REVIEW_INSTANCE
