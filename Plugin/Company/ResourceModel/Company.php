@@ -97,7 +97,9 @@ class Company
         MagentoCompanyModel $company
     ) {
         $hokodoCompany = $this->companyRepository->getByEntityId((int) $company->getEntityId());
-        if (!$hokodoCompany->getId() && ($apiCompany = $this->getHokodoApiCompany($company))) {
+        if (!$hokodoCompany->getId() &&
+            $company->getData($this->regNumberAttributeCode) &&
+            ($apiCompany = $this->getHokodoApiCompany($company))) {
             $hokodoCompany
                 ->setEntityId((int) $company->getEntityId())
                 ->setCompanyId($apiCompany->getId())
