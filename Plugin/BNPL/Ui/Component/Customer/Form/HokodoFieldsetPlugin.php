@@ -8,8 +8,8 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Plugin\BNPL\Ui\Component\Customer\Form;
 
 use Hokodo\BNPL\Gateway\Config\Config;
-use Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset;
 use Hokodo\BNPL\Model\Config\Source\EntityLevelForSave;
+use Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset;
 
 class HokodoFieldsetPlugin
 {
