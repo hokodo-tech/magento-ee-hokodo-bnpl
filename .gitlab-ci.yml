@@ -46,7 +46,7 @@ php:compat:
   extends: .ssh-client
   stage: test
   variables:
-    REVIEW_INSTANCE: magento_ee_$CI_MERGE_REQUEST_IID
+    REVIEW_INSTANCE: magento_$CI_MERGE_REQUEST_IID_ee
     SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY_DEV
     SSH_HOST:        $SSH_HOST_DEV
     SSH_PATH:        /var/www/$REVIEW_INSTANCE
@@ -67,7 +67,7 @@ review:create:
     PHP_CLI: php$PHP_VERSION
     COMPOSER_CLI: composer$COMPOSER_VERSION
   environment:
-    url: https://qa-ee${CI_MERGE_REQUEST_IID}.${DEPLOY_HOST_DEV}
+    url: https://qa${CI_MERGE_REQUEST_IID}-ee.${DEPLOY_HOST_DEV}
     on_stop: review:detach
   script:
     - ssh "magento@$SSH_HOST"

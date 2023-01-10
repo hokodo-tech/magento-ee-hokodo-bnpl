@@ -9,7 +9,7 @@ namespace Hokodo\BnplCommerce\Plugin\BNPL\Ui\Component\Customer\Form;
 
 use Hokodo\BNPL\Gateway\Config\Config;
 use Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset;
-use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
+use Hokodo\BNPL\Model\Config\Source\EntityLevelForSave;
 
 class HokodoFieldsetPlugin
 {
