@@ -5,7 +5,7 @@
     <fieldset name="hokodo" sortOrder="999" class="Hokodo\BnplCommerce\Ui\Component\Company\Form\HokodoFieldset">
         <settings>
             <collapsible>true</collapsible>
-            <label translate="true">Hokodo</label>
+            <label translate="true">Trade Credit (Hokodo)</label>
             <dataScope>hokodo</dataScope>
         </settings>
         <field name="hokodo_credit_limit" component="Hokodo_BnplCommerce/js/component/form/company-credit-limit"
