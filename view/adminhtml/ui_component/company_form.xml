@@ -8,16 +8,11 @@
             <label translate="true">Trade Credit (Hokodo)</label>
             <dataScope>hokodo</dataScope>
         </settings>
-        <field name="hokodo_credit_limit" component="Hokodo_BnplCommerce/js/component/form/company-credit-limit"
-               sortOrder="9"
-               formElement="hidden"
-               template="Hokodo_BnplCommerce/component/form/company-credit-limit">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataScope" xsi:type="string">hokodo_credit_limit</item>
-                </item>
-            </argument>
-        </field>
+        <container name="credit_limit">
+            <htmlContent name="html_content">
+                <block name="hokodoCreditBalance" class="Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit\CreditBalance"/>
+            </htmlContent>
+        </container>
         <field name="companyId" component="Hokodo_BNPL/js/sdk/company-search"
                sortOrder="10"
                formElement="input"
