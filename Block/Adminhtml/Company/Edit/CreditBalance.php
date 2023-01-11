@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit;
@@ -6,9 +7,11 @@ namespace Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 
-class CreditBalance extends \Magento\Backend\Block\Template
+class CreditBalance extends Template
 {
     /**
      * @var string
@@ -16,7 +19,7 @@ class CreditBalance extends \Magento\Backend\Block\Template
     protected $_template = 'company/edit/credit_balance.phtml';
 
     /**
-     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     * @var PriceCurrencyInterface
      */
     private $priceFormatter;
 
@@ -26,11 +29,6 @@ class CreditBalance extends \Magento\Backend\Block\Template
     private $company;
 
     /**
-     * @var CreditLimitInterface
-     */
-    private $credit;
-
-    /**
      * @var CompanyRepositoryInterface
      */
     private CompanyRepositoryInterface $companyRepository;
@@ -38,16 +36,14 @@ class CreditBalance extends \Magento\Backend\Block\Template
     /**
      * CreditBalance constructor.
      *
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\CompanyCredit\Api\Data\CreditLimitInterface $creditLimit
-     * @param \Magento\CompanyCredit\Api\CreditDataProviderInterface $creditDataProvider
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceFormatter
-     * @param \Magento\CompanyCredit\Model\WebsiteCurrency $websiteCurrency
-     * @param array $data
+     * @param Context                    $context
+     * @param PriceCurrencyInterface     $priceFormatter
+     * @param CompanyRepositoryInterface $companyRepository
+     * @param array                      $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceFormatter,
+        Context $context,
+        PriceCurrencyInterface $priceFormatter,
         CompanyRepositoryInterface $companyRepository,
         array $data = []
     ) {
@@ -56,51 +52,14 @@ class CreditBalance extends \Magento\Backend\Block\Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * Is company eligible.
+     *
+     * @return bool
+     */
     public function isEligible(): bool
     {
         return (bool) $this->getCredit();
-    }
-
-    public function getAmount()
-    {
-        $amount = $this->getCredit() ? $this->getCredit()->getAmount() / 100 : 0;
-
-        return $this->priceFormatter->format(
-            $amount,
-            false,
-            0,
-            null,
-            $this->getCredit()->getCurrency()
-        );
-
-    }
-
-    public function getAmountInUse()
-    {
-        $amount = $this->getCredit() ? $this->getCredit()->getAmountInUse() / 100 : 0;
-
-        return $this->priceFormatter->format(
-            $amount,
-            false,
-            0,
-            null,
-            $this->getCredit()->getCurrency()
-        );
-
-    }
-
-    public function getAmountAvailable()
-    {
-        $amount = $this->getCredit() ? $this->getCredit()->getAmountAvailable() / 100 : 0;
-
-        return $this->priceFormatter->format(
-            $amount,
-            false,
-            0,
-            null,
-            $this->getCredit()->getCurrency()
-        );
-
     }
 
     /**
@@ -113,6 +72,11 @@ class CreditBalance extends \Magento\Backend\Block\Template
         return $this->getCompany()->getCreditLimit();
     }
 
+    /**
+     * Get hokodo company.
+     *
+     * @return CompanyInterface
+     */
     public function getCompany(): CompanyInterface
     {
         $companyId = $this->getRequest()->getParam('id');
@@ -121,5 +85,53 @@ class CreditBalance extends \Magento\Backend\Block\Template
         }
 
         return $this->company;
+    }
+
+    /**
+     * Get credit amount.
+     *
+     * @return string
+     */
+    public function getAmount(): string
+    {
+        return $this->getFormattedPrice($this->getCredit() ? $this->getCredit()->getAmount() / 100 : 0);
+    }
+
+    /**
+     * Get credit amount in use.
+     *
+     * @return string
+     */
+    public function getAmountInUse(): string
+    {
+        return $this->getFormattedPrice($this->getCredit() ? $this->getCredit()->getAmountInUse() / 100 : 0);
+    }
+
+    /**
+     * Get credit limit available.
+     *
+     * @return string
+     */
+    public function getAmountAvailable(): string
+    {
+        return $this->getFormattedPrice($this->getCredit() ? $this->getCredit()->getAmountAvailable() / 100 : 0);
+    }
+
+    /**
+     * Get formatted price for components.
+     *
+     * @param float $amount
+     *
+     * @return string
+     */
+    private function getFormattedPrice(float $amount): string
+    {
+        return $this->priceFormatter->format(
+            $amount,
+            false,
+            0,
+            null,
+            $this->getCredit()->getCurrency()
+        );
     }
 }
