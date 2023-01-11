@@ -67,7 +67,7 @@ review:create:
     PHP_CLI: php$PHP_VERSION
     COMPOSER_CLI: composer$COMPOSER_VERSION
   environment:
-    url: https://qa-ee${CI_MERGE_REQUEST_IID}.${DEPLOY_HOST_DEV}
+    url: https://qa${CI_MERGE_REQUEST_IID}-ee.${DEPLOY_HOST_DEV}
     on_stop: review:detach
   script:
     - ssh "magento@$SSH_HOST"
@@ -150,7 +150,7 @@ test:e2e:
       junit: playwright-results.xml
     expire_in: 1 week
   variables:
-    BASE_URL: https://qa-ee${CI_MERGE_REQUEST_IID}.${DEPLOY_HOST_DEV}
+    BASE_URL: https://qa${CI_MERGE_REQUEST_IID}-ee.${DEPLOY_HOST_DEV}
   script:
     - npm install
     - npx playwright install --with-deps

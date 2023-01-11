@@ -1,0 +1,35 @@
+<?php
+/**
+ * @var $block \Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit\CreditBalance
+ */
+?>
+<ul class="credit-balance-list" data-role="credit-balance">
+    <?php if ($block->getCompany()->getCompanyId()): ?>
+        <li class="credit-balance-item">
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Eligible:')) ?></p>
+            <span class="credit-balance-price">
+                <?= $block->isEligible() ? __('Yes') : __('No') ?>
+            </span>
+        </li>
+        <?php if ($block->isEligible()): ?>
+        <li class="credit-balance-item">
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount:')) ?></p>
+            <span class="credit-balance-price">
+                <?= $block->escapeHtml($block->getAmount()) ?>
+            </span>
+        </li>
+        <li class="credit-balance-item">
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount in use:')) ?></p>
+            <span class="credit-balance-price">
+                <?= $block->escapeHtml($block->getAmountInUse()) ?>
+            </span>
+        </li>
+        <li class="credit-balance-item">
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount available:')) ?></p>
+            <span class="credit-balance-price">
+                <?= $block->escapeHtml($block->getAmountAvailable()) ?>
+            </span>
+        </li>
+        <?php endif; ?>
+    <?php endif; ?>
+</ul>

@@ -21,7 +21,7 @@ $om = $bootstrap->getObjectManager();
 $storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
 $url = $storeManager->getStore()->getBaseUrl();
 $qaPrefixMatch = null;
-preg_match('/qa-ee(?<qa_id>[\d]+)/', $url, $qaPrefixMatch);
+preg_match('/qa(?<qa_id>[\d]+)/', $url, $qaPrefixMatch);
 $prefix = $qaPrefixMatch['qa_id'] ?? '';
 $prefix .= '+';
 $customerEmails = [

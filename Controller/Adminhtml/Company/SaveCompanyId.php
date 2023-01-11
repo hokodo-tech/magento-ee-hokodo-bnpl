@@ -131,7 +131,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         if ($entityId && $companyId) {
             $hokodoCompany = $this->companyRepository->getByEntityId((int) $entityId);
             if (!$hokodoCompany->getId()) {
-                $hokodoCompany->setId($entityId);
+                $hokodoCompany->setEntityId($entityId);
             }
             $oldCompanyId = $hokodoCompany->getCompanyId();
             $hokodoCompany->setCompanyId($companyId);
@@ -201,7 +201,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
                 if ($hokodoQuote->getQuoteId()) {
                     $this->hokodoQuoteRepository->deleteByQuoteId($cart->getId());
                 }
-                $this->sessionCleaner->clearFor($user->getId());
+                $this->sessionCleaner->clearFor((int) $user->getId());
             }
         } catch (NoSuchEntityException $e) {
             $data = [
