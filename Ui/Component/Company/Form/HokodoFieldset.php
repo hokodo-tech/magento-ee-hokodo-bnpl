@@ -6,6 +6,7 @@ namespace Hokodo\BnplCommerce\Ui\Component\Company\Form;
 
 use Hokodo\BNPL\Gateway\Config\Config;
 use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 
 class HokodoFieldset extends \Magento\Ui\Component\Form\Fieldset
@@ -16,15 +17,22 @@ class HokodoFieldset extends \Magento\Ui\Component\Form\Fieldset
     private Config $paymentConfig;
 
     /**
+     * @var RequestInterface
+     */
+    private RequestInterface $request;
+
+    /**
      * HokodoFieldset constructor.
      *
      * @param Config           $paymentConfig
+     * @param RequestInterface $request
      * @param ContextInterface $context
      * @param array            $components
      * @param array            $data
      */
     public function __construct(
         Config $paymentConfig,
+        RequestInterface $request,
         ContextInterface $context,
         array $components = [],
         array $data = []
@@ -35,6 +43,7 @@ class HokodoFieldset extends \Magento\Ui\Component\Form\Fieldset
             $data
         );
         $this->paymentConfig = $paymentConfig;
+        $this->request = $request;
     }
 
     /**
@@ -45,7 +54,8 @@ class HokodoFieldset extends \Magento\Ui\Component\Form\Fieldset
     public function prepare()
     {
         $config = $this->getData('config');
-        $config['visible'] = $this->paymentConfig->getEntityLevel() === EntityLevelForSave::COMPANY;
+        $config['visible'] = $this->paymentConfig->getEntityLevel() === EntityLevelForSave::COMPANY &&
+            $this->request->getActionName() !== 'new';
         $this->setData('config', $config);
         parent::prepare();
     }
