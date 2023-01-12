@@ -49,22 +49,6 @@ interface CompanyInterface extends HokodoEntityInterface
     public function setEntityId(?int $entityId): self;
 
     /**
-     * Getter for CompanyId.
-     *
-     * @return string|null
-     */
-    public function getCompanyId(): ?string;
-
-    /**
-     * Setter for CompanyId.
-     *
-     * @param string|null $companyId
-     *
-     * @return self
-     */
-    public function setCompanyId(?string $companyId): self;
-
-    /**
      * Organisation Id getter.
      *
      * @return string|null

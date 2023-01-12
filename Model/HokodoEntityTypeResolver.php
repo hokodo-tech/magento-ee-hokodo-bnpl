@@ -7,11 +7,11 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Model;
 
-use Hokodo\BNPL\Api\HokodoEntityResolverInterface;
+use Hokodo\BNPL\Api\HokodoEntityTypeResolverInterface;
 use Hokodo\Bnpl\Gateway\Config\Config;
 use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
 
-class HokodoEntityResolver implements HokodoEntityResolverInterface
+class HokodoEntityTypeResolver implements HokodoEntityTypeResolverInterface
 {
     /**
      * @var Config
@@ -32,7 +32,7 @@ class HokodoEntityResolver implements HokodoEntityResolverInterface
      *
      * @return string
      */
-    public function getEntityType(): string
+    public function resolve(): string
     {
         return $this->config->getEntityLevel() ?: EntityLevelForSave::COMPANY;
     }
