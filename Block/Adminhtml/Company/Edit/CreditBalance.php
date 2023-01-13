@@ -75,9 +75,9 @@ class CreditBalance extends Template
     /**
      * Get hokodo company.
      *
-     * @return CompanyInterface
+     * @return CompanyInterface|null
      */
-    public function getCompany(): CompanyInterface
+    public function getCompany(): ?CompanyInterface
     {
         $companyId = $this->getRequest()->getParam('id');
         if ($companyId && empty($this->company)) {
