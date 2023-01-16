@@ -115,6 +115,8 @@ class CompanyRepository implements CompanyRepositoryInterface
     }
 
     /**
+     * Populate data model object from model data.
+     *
      * @param CompanyModel $companyModel
      *
      * @return CompanyInterface
