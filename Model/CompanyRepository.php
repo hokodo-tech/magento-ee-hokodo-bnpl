@@ -11,6 +11,7 @@ namespace Hokodo\BnplCommerce\Model;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
+use Hokodo\BnplCommerce\Model\Company as CompanyModel;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
@@ -89,35 +90,43 @@ class CompanyRepository implements CompanyRepositoryInterface
     public function getByEntityId(int $entityId): CompanyInterface
     {
         $companyModel = $this->companyFactory->create();
-        $companyDO = $this->companyInterfaceFactory->create();
-
         $this->companyResource->load($companyModel, $entityId, CompanyInterface::ENTITY_ID);
-        if ($creditLimitJson = $companyModel->getData(CompanyInterface::CREDIT_LIMIT)) {
-            $companyModel->setData(CompanyInterface::CREDIT_LIMIT, $this->serializer->unserialize($creditLimitJson));
-        }
-        $this->dataObjectHelper->populateWithArray($companyDO, $companyModel->getData(), CompanyInterface::class);
 
-        return $companyDO;
+        return $this->populateDataObject($companyModel);
     }
 
     /**
      * Get Hokodo Company Instance By Customer Id.
      *
-     * @param int $entityId
+     * @param int $customerId
      *
      * @return CompanyInterface
      */
-    public function getById(int $entityId): CompanyInterface
+    public function getByCustomerId(int $customerId): CompanyInterface
     {
-        $magentoCompanyId = 0;
         /** @var \Magento\Company\Api\Data\CompanyInterface $company */
-        $company = $this->companyManagement->getByCustomerId($entityId);
-        if ($company) {
-            $magentoCompanyId = $company->getId();
-        }
+        $company = $this->companyManagement->getByCustomerId($customerId);
         $companyModel = $this->companyFactory->create();
+        if ($company) {
+            $this->companyResource->load($companyModel, $company->getId(), CompanyInterface::ENTITY_ID);
+        }
+
+        return $this->populateDataObject($companyModel);
+    }
+
+    /**
+     * Populate data model object from model data.
+     *
+     * @param CompanyModel $companyModel
+     *
+     * @return CompanyInterface
+     */
+    public function populateDataObject(CompanyModel $companyModel): CompanyInterface
+    {
         $companyDO = $this->companyInterfaceFactory->create();
-        $this->companyResource->load($companyModel, $magentoCompanyId, CompanyInterface::ENTITY_ID);
+        if ($creditLimitJson = $companyModel->getData(CompanyInterface::CREDIT_LIMIT)) {
+            $companyModel->setData(CompanyInterface::CREDIT_LIMIT, $this->serializer->unserialize($creditLimitJson));
+        }
         $this->dataObjectHelper->populateWithArray($companyDO, $companyModel->getData(), CompanyInterface::class);
 
         return $companyDO;

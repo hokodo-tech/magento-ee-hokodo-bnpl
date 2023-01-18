@@ -3,6 +3,7 @@
  * @var $block \Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit\CreditBalance
  */
 ?>
+<?php if ($block->getCompany()): ?>
 <ul class="credit-balance-list" data-role="credit-balance">
     <?php if ($block->getCompany()->getCompanyId()): ?>
         <li class="credit-balance-item">
@@ -33,3 +34,4 @@
         <?php endif; ?>
     <?php endif; ?>
 </ul>
+<?php endif; ?>
