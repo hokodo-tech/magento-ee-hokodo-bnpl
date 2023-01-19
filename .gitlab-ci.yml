@@ -183,7 +183,7 @@ test:e2e:
   script:
     - ssh "magento@$SSH_HOST" "cd $SSH_PATH/app/code/ && rm -rf * && mkdir -p Hokodo/BnplCommerce/"
     - ssh "magento@$SSH_HOST" "cd $SSH_PATH && rm -rf vendor/hokodo"
-    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI /usr/local/bin/$COMPOSER_CLI install --no-cache"
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI /usr/local/bin/$COMPOSER_CLI require hokodo/magento-bnpl:dev-master"
     - scp -r * "magento@$SSH_HOST:$SSH_PATH/app/code/Hokodo/BnplCommerce/"
     - ssh "magento@$SSH_HOST"
       "cd $SSH_PATH &&
