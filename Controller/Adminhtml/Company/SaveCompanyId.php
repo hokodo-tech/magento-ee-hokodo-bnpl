@@ -9,12 +9,8 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Controller\Adminhtml\Company;
 
 use Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface;
+use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
-use Hokodo\BnplCommerce\Gateway\Service\Company;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Company\Api\CompanyRepositoryInterface as MagentoCompanyRepositoryInterface;
@@ -26,7 +22,6 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class SaveCompanyId extends Action implements HttpPostActionInterface
@@ -62,39 +57,27 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     private HokodoQuoteRepositoryInterface $hokodoQuoteRepository;
 
     /**
-     * @var CompanyCreditRequestInterfaceFactory
-     */
-    private CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory;
-
-    /**
-     * @var Company
-     */
-    private Company $gateway;
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
 
     /**
-     * @var StoreManagerInterface
+     * @var CompanyCreditServiceInterface
      */
-    private StoreManagerInterface $storeManager;
+    private CompanyCreditServiceInterface $companyCreditService;
 
     /**
      * SaveCompanyId constructor.
      *
-     * @param Context                              $context
-     * @param CompanyRepositoryInterface           $companyRepository
-     * @param CartRepositoryInterface              $cartRepository
-     * @param SessionCleanerInterface              $sessionCleaner
-     * @param CompanyUsers                         $companyUsers
-     * @param MagentoCompanyRepositoryInterface    $magentoCompanyRepository
-     * @param HokodoQuoteRepositoryInterface       $hokodoQuoteRepository
-     * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
-     * @param Company                              $gateway
-     * @param LoggerInterface                      $logger
-     * @param StoreManagerInterface                $storeManager
+     * @param Context                           $context
+     * @param CompanyRepositoryInterface        $companyRepository
+     * @param CartRepositoryInterface           $cartRepository
+     * @param SessionCleanerInterface           $sessionCleaner
+     * @param CompanyUsers                      $companyUsers
+     * @param MagentoCompanyRepositoryInterface $magentoCompanyRepository
+     * @param HokodoQuoteRepositoryInterface    $hokodoQuoteRepository
+     * @param LoggerInterface                   $logger
+     * @param CompanyCreditServiceInterface     $companyCreditService
      */
     public function __construct(
         Context $context,
@@ -104,10 +87,8 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         CompanyUsers $companyUsers,
         MagentoCompanyRepositoryInterface $magentoCompanyRepository,
         HokodoQuoteRepositoryInterface $hokodoQuoteRepository,
-        CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
-        Company $gateway,
         LoggerInterface $logger,
-        StoreManagerInterface $storeManager
+        CompanyCreditServiceInterface $companyCreditService,
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -116,10 +97,8 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         $this->companyUsers = $companyUsers;
         $this->magentoCompanyRepository = $magentoCompanyRepository;
         $this->hokodoQuoteRepository = $hokodoQuoteRepository;
-        $this->companyCreditRequestFactory = $companyCreditRequestFactory;
-        $this->gateway = $gateway;
         $this->logger = $logger;
-        $this->storeManager = $storeManager;
+        $this->companyCreditService = $companyCreditService;
     }
 
     /**
@@ -144,7 +123,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             }
             $oldCompanyId = $hokodoCompany->getCompanyId();
             $hokodoCompany->setCompanyId($companyId);
-            $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($companyId));
+            $hokodoCompany->setCreditLimit($this->companyCreditService->getCreditLimit($companyId));
 
             try {
                 $data = [
@@ -220,39 +199,5 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             ];
             $this->logger->error(__METHOD__, $data);
         }
-    }
-
-    /**
-     * Get company credit limit.
-     *
-     * @param string $companyId
-     *
-     * @return CreditLimitInterface|null
-     *
-     * @throws NoSuchEntityException
-     */
-    private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
-    {
-        /** @var CompanyCreditRequestInterface $searchRequest */
-        $searchRequest = $this->companyCreditRequestFactory->create();
-        $searchRequest
-            ->setCurrency($this->storeManager->getStore()->getCurrentCurrencyCode())
-            ->setCompanyId($companyId);
-
-        try {
-            /** @var CreditInterface $companyCredit */
-            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
-            if (!$companyCredit->getRejectionReason()) {
-                return $companyCredit->getCreditLimit();
-            }
-        } catch (\Exception $e) {
-            $data = [
-                'message' => 'Hokodo_BNPL: company credit call failed with error.',
-                'error' => $e->getMessage(),
-            ];
-            $this->logger->error(__METHOD__, $data);
-        }
-
-        return null;
     }
 }
