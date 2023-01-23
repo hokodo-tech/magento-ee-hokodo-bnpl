@@ -69,7 +69,7 @@ class CreditBalance extends Template
      */
     public function getCredit(): ?CreditLimitInterface
     {
-        return $this->getCompany()->getCreditLimit();
+        return $this->getCompany()?->getCreditLimit();
     }
 
     /**
