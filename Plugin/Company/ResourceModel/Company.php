@@ -20,6 +20,7 @@ use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class Company
@@ -57,6 +58,11 @@ class Company
     private LoggerInterface $logger;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
      * Company constructor.
      *
      * @param CompanyRepositoryInterface           $companyRepository
@@ -64,6 +70,7 @@ class Company
      * @param CompanySearchRequestInterfaceFactory $companySearchRequestFactory
      * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
      * @param LoggerInterface                      $logger
+     * @param StoreManagerInterface                $storeManager
      * @param string|null                          $regNumberAttributeCode
      */
     public function __construct(
@@ -72,6 +79,7 @@ class Company
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
         CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
         LoggerInterface $logger,
+        StoreManagerInterface $storeManager,
         ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
@@ -80,6 +88,7 @@ class Company
         $this->companyCreditRequestFactory = $companyCreditRequestFactory;
         $this->logger = $logger;
         $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -151,7 +160,9 @@ class Company
     {
         /** @var CompanyCreditRequestInterface $searchRequest */
         $searchRequest = $this->companyCreditRequestFactory->create();
-        $searchRequest->setCompanyId($companyId);
+        $searchRequest
+            ->setCurrency($this->storeManager->getStore()->getCurrentCurrencyCode())
+            ->setCompanyId($companyId);
 
         try {
             /** @var CreditInterface $companyCredit */

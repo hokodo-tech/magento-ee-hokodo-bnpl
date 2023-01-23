@@ -26,6 +26,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class SaveCompanyId extends Action implements HttpPostActionInterface
@@ -76,6 +77,11 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     private LoggerInterface $logger;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
      * SaveCompanyId constructor.
      *
      * @param Context                              $context
@@ -88,6 +94,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
      * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
      * @param Company                              $gateway
      * @param LoggerInterface                      $logger
+     * @param StoreManagerInterface                $storeManager
      */
     public function __construct(
         Context $context,
@@ -99,7 +106,8 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         HokodoQuoteRepositoryInterface $hokodoQuoteRepository,
         CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
         Company $gateway,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -111,6 +119,7 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         $this->companyCreditRequestFactory = $companyCreditRequestFactory;
         $this->gateway = $gateway;
         $this->logger = $logger;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -219,12 +228,16 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
      * @param string $companyId
      *
      * @return CreditLimitInterface|null
+     *
+     * @throws NoSuchEntityException
      */
     private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
     {
         /** @var CompanyCreditRequestInterface $searchRequest */
         $searchRequest = $this->companyCreditRequestFactory->create();
-        $searchRequest->setCompanyId($companyId);
+        $searchRequest
+            ->setCurrency($this->storeManager->getStore()->getCurrentCurrencyCode())
+            ->setCompanyId($companyId);
 
         try {
             /** @var CreditInterface $companyCredit */
