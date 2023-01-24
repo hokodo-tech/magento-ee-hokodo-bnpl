@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Observer;
 
+use Hokodo\BNPL\Gateway\Config\Config;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Hokodo\BnplCommerce\Model\CompanyCreditService;
@@ -54,7 +55,7 @@ class OrderPlaceSuccessObserver implements ObserverInterface
     {
         /** @var OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
-        if ($order->getPayment()->getMethod() === \Hokodo\BNPL\Gateway\Config\Config::CODE) {
+        if (!$order->getCustomerIsGuest() && $order->getPayment()->getMethod() === Config::CODE) {
             /** @var CompanyInterface $company */
             $company = $this->companyRepository->getByCustomerId((int) $order->getCustomerId());
             if ($companyId = $company->getCompanyId()) {
