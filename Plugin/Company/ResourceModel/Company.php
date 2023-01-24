@@ -8,11 +8,8 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Plugin\Company\ResourceModel;
 
 use Hokodo\BNPL\Api\Data\CompanyInterface as ApiCompany;
+use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface;
 use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
 use Hokodo\BnplCommerce\Gateway\Service\Company as Gateway;
@@ -47,14 +44,14 @@ class Company
     private CompanySearchRequestInterfaceFactory $companySearchRequestFactory;
 
     /**
-     * @var CompanyCreditRequestInterfaceFactory
-     */
-    private CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory;
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
+
+    /**
+     * @var CompanyCreditServiceInterface
+     */
+    private CompanyCreditServiceInterface $companyCreditService;
 
     /**
      * Company constructor.
@@ -62,24 +59,24 @@ class Company
      * @param CompanyRepositoryInterface           $companyRepository
      * @param Gateway                              $gateway
      * @param CompanySearchRequestInterfaceFactory $companySearchRequestFactory
-     * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
      * @param LoggerInterface                      $logger
+     * @param CompanyCreditServiceInterface        $companyCreditService
      * @param string|null                          $regNumberAttributeCode
      */
     public function __construct(
         CompanyRepositoryInterface $companyRepository,
         Gateway $gateway,
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
-        CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
         LoggerInterface $logger,
+        CompanyCreditServiceInterface $companyCreditService,
         ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
         $this->gateway = $gateway;
         $this->companySearchRequestFactory = $companySearchRequestFactory;
-        $this->companyCreditRequestFactory = $companyCreditRequestFactory;
         $this->logger = $logger;
         $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
+        $this->companyCreditService = $companyCreditService;
     }
 
     /**
@@ -103,7 +100,7 @@ class Company
             $hokodoCompany
                 ->setEntityId((int) $company->getEntityId())
                 ->setCompanyId($apiCompany->getId())
-                ->setCreditLimit($this->getCompanyCreditLimit($apiCompany->getId()));
+                ->setCreditLimit($this->companyCreditService->getCreditLimit($apiCompany->getId()));
             $this->companyRepository->save($hokodoCompany);
         }
 
@@ -137,36 +134,6 @@ class Company
         }
 
         $this->logger->debug(__METHOD__, $company->getData());
-        return null;
-    }
-
-    /**
-     * Get company credit limit.
-     *
-     * @param string $companyId
-     *
-     * @return CreditLimitInterface|null
-     */
-    private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
-    {
-        /** @var CompanyCreditRequestInterface $searchRequest */
-        $searchRequest = $this->companyCreditRequestFactory->create();
-        $searchRequest->setCompanyId($companyId);
-
-        try {
-            /** @var CreditInterface $companyCredit */
-            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
-            if (!$companyCredit->getRejectionReason()) {
-                return $companyCredit->getCreditLimit();
-            }
-        } catch (\Exception $e) {
-            $data = [
-                'message' => 'Hokodo_BNPL: company credit call failed with error.',
-                'error' => $e->getMessage(),
-            ];
-            $this->logger->error(__METHOD__, $data);
-        }
-
         return null;
     }
 }

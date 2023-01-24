@@ -7,12 +7,8 @@ namespace Hokodo\BnplCommerce\Plugin\PostSale;
 use Hokodo\BNPL\Gateway\Command\PostSale\CapturePayment;
 use Hokodo\BNPL\Gateway\Command\PostSale\RefundPayment;
 use Hokodo\BNPL\Gateway\Command\PostSale\VoidPayment;
+use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterfaceFactory;
-use Hokodo\BnplCommerce\Gateway\Service\Company;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
@@ -25,19 +21,9 @@ class UpdateCompanyCreditLimit
     private CompanyManagementInterface $companyManagement;
 
     /**
-     * @var Company
-     */
-    private Company $gateway;
-
-    /**
      * @var CompanyRepositoryInterface
      */
     private CompanyRepositoryInterface $companyRepository;
-
-    /**
-     * @var CompanyCreditRequestInterfaceFactory
-     */
-    private CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory;
 
     /**
      * @var LoggerInterface
@@ -45,26 +31,28 @@ class UpdateCompanyCreditLimit
     private LoggerInterface $logger;
 
     /**
+     * @var CompanyCreditServiceInterface
+     */
+    private CompanyCreditServiceInterface $companyCreditService;
+
+    /**
      * UpdateHokodoCompanyLimit constructor.
      *
-     * @param CompanyManagementInterface           $companyManagement
-     * @param Company                              $gateway
-     * @param CompanyRepositoryInterface           $companyRepository
-     * @param CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory
-     * @param LoggerInterface                      $logger
+     * @param CompanyManagementInterface    $companyManagement
+     * @param CompanyRepositoryInterface    $companyRepository
+     * @param LoggerInterface               $logger
+     * @param CompanyCreditServiceInterface $companyCreditService
      */
     public function __construct(
         CompanyManagementInterface $companyManagement,
-        Company $gateway,
         CompanyRepositoryInterface $companyRepository,
-        CompanyCreditRequestInterfaceFactory $companyCreditRequestFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        CompanyCreditServiceInterface $companyCreditService
     ) {
         $this->companyManagement = $companyManagement;
-        $this->gateway = $gateway;
         $this->companyRepository = $companyRepository;
-        $this->companyCreditRequestFactory = $companyCreditRequestFactory;
         $this->logger = $logger;
+        $this->companyCreditService = $companyCreditService;
     }
 
     /**
@@ -82,10 +70,12 @@ class UpdateCompanyCreditLimit
         try {
             /* @var OrderInterface $order */
             if (($customerId = $commandSubject['payment']->getOrder()->getCustomerId()) &&
-                ($company = $this->companyManagement->getByCustomerId($customerId))) {
+                ($company = $this->companyManagement->getByCustomerId((int) $customerId))) {
                 $hokodoCompany = $this->companyRepository->getByEntityId((int) $company->getId());
                 if ($hokodoCompany->getEntityId()) {
-                    $hokodoCompany->setCreditLimit($this->getCompanyCreditLimit($hokodoCompany->getCompanyId()));
+                    $hokodoCompany->setCreditLimit(
+                        $this->companyCreditService->getCreditLimit($hokodoCompany->getCompanyId())
+                    );
                     $this->companyRepository->save($hokodoCompany);
                 }
             }
@@ -99,35 +89,5 @@ class UpdateCompanyCreditLimit
         }
 
         return $result;
-    }
-
-    /**
-     * Get company credit limit.
-     *
-     * @param string $companyId
-     *
-     * @return CreditLimitInterface|null
-     */
-    private function getCompanyCreditLimit(string $companyId): ?CreditLimitInterface
-    {
-        /** @var CompanyCreditRequestInterface $searchRequest */
-        $searchRequest = $this->companyCreditRequestFactory->create();
-        $searchRequest->setCompanyId($companyId);
-
-        try {
-            /** @var CreditInterface $companyCredit */
-            $companyCredit = $this->gateway->getCredit($searchRequest)->getDataModel();
-            if (!$companyCredit->getRejectionReason()) {
-                return $companyCredit->getCreditLimit();
-            }
-        } catch (\Exception $e) {
-            $data = [
-                'message' => 'Hokodo_BNPL: company credit call failed with error.',
-                'error' => $e->getMessage(),
-            ];
-            $this->logger->error(__METHOD__, $data);
-        }
-
-        return null;
     }
 }

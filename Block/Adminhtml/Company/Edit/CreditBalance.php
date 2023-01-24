@@ -69,7 +69,7 @@ class CreditBalance extends Template
      */
     public function getCredit(): ?CreditLimitInterface
     {
-        return $this->getCompany()->getCreditLimit();
+        return $this->getCompany()?->getCreditLimit();
     }
 
     /**
@@ -94,7 +94,7 @@ class CreditBalance extends Template
      */
     public function getAmount(): string
     {
-        return $this->getFormattedPrice($this->getCredit() ? $this->getCredit()->getAmount() / 100 : 0);
+        return $this->getFormattedPrice($this->getCredit() ? $this->getCredit()->getAmount() / 100 : 0, 0);
     }
 
     /**
@@ -120,16 +120,17 @@ class CreditBalance extends Template
     /**
      * Get formatted price for components.
      *
-     * @param float $amount
+     * @param float    $amount
+     * @param int|null $precision
      *
      * @return string
      */
-    private function getFormattedPrice(float $amount): string
+    private function getFormattedPrice(float $amount, int $precision = null): string
     {
         return $this->priceFormatter->format(
             $amount,
             false,
-            0,
+            $precision ?? 2,
             null,
             $this->getCredit()->getCurrency()
         );

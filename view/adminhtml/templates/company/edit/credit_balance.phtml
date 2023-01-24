@@ -3,35 +3,25 @@
  * @var $block \Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit\CreditBalance
  */
 ?>
-<?php if ($block->getCompany()): ?>
+<?php if ($block->isEligible() && $block->getCompany()->getCompanyId()): ?>
 <ul class="credit-balance-list" data-role="credit-balance">
-    <?php if ($block->getCompany()->getCompanyId()): ?>
         <li class="credit-balance-item">
-            <p class="credit-balance-label"><?= $block->escapeHtml(__('Eligible:')) ?></p>
-            <span class="credit-balance-price">
-                <?= $block->isEligible() ? __('Yes') : __('No') ?>
-            </span>
-        </li>
-        <?php if ($block->isEligible()): ?>
-        <li class="credit-balance-item">
-            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount:')) ?></p>
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Credit Limit:')) ?></p>
             <span class="credit-balance-price">
                 <?= $block->escapeHtml($block->getAmount()) ?>
             </span>
         </li>
         <li class="credit-balance-item">
-            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount in use:')) ?></p>
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Outstanding Balance:')) ?></p>
             <span class="credit-balance-price">
                 <?= $block->escapeHtml($block->getAmountInUse()) ?>
             </span>
         </li>
         <li class="credit-balance-item">
-            <p class="credit-balance-label"><?= $block->escapeHtml(__('Amount available:')) ?></p>
+            <p class="credit-balance-label"><?= $block->escapeHtml(__('Available Credit:')) ?></p>
             <span class="credit-balance-price">
                 <?= $block->escapeHtml($block->getAmountAvailable()) ?>
             </span>
         </li>
-        <?php endif; ?>
-    <?php endif; ?>
 </ul>
 <?php endif; ?>
