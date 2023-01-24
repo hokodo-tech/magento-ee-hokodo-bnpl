@@ -67,6 +67,7 @@
     <preference for="Hokodo\BnplCommerce\Api\Data\Gateway\CompanyCreditRequestInterface" type="Hokodo\BnplCommerce\Model\Data\Gateway\CompanyCreditRequest" />
     <preference for="Hokodo\BnplCommerce\Api\Data\Company\CreditInterface" type="Hokodo\BnplCommerce\Model\Data\Company\Credit" />
     <preference for="Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface" type="Hokodo\BnplCommerce\Model\Data\Company\CreditLimit" />
+    <preference for="Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface" type="Hokodo\BnplCommerce\Model\CompanyCreditService" />
 
     <virtualType name="Hokodo\BNPL\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
