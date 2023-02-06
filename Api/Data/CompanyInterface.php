@@ -1,9 +1,13 @@
 <?php
+/**
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
+ */
 
 namespace Hokodo\BnplCommerce\Api\Data;
 
+use Hokodo\BNPL\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BNPL\Api\Data\HokodoEntityInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 
 interface CompanyInterface extends HokodoEntityInterface
 {
@@ -67,14 +71,14 @@ interface CompanyInterface extends HokodoEntityInterface
     /**
      * Credit Limit getter.
      *
-     * @return \Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface|null
+     * @return \Hokodo\BNPL\Api\Data\Company\CreditLimitInterface|null
      */
     public function getCreditLimit(): ?CreditLimitInterface;
 
     /**
      * Credit Limit setter.
      *
-     * @param \Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface|null $creditLimit
+     * @param \Hokodo\BNPL\Api\Data\Company\CreditLimitInterface|null $creditLimit
      *
      * @return $this
      */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
  * See LICENSE for license details.
  */
 
@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Model\Data;
 
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
+use Hokodo\BNPL\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Magento\Framework\DataObject;
 

@@ -1,13 +1,17 @@
 <?php
+/**
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
+ */
 
 declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Plugin\PostSale;
 
+use Hokodo\BNPL\Api\CompanyCreditServiceInterface;
 use Hokodo\BNPL\Gateway\Command\PostSale\CapturePayment;
 use Hokodo\BNPL\Gateway\Command\PostSale\RefundPayment;
 use Hokodo\BNPL\Gateway\Command\PostSale\VoidPayment;
-use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Sales\Api\Data\OrderInterface;

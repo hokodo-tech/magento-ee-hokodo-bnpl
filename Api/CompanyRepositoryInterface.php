@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
  * See LICENSE for license details.
  */
 
@@ -10,6 +10,8 @@ namespace Hokodo\BnplCommerce\Api;
 
 use Hokodo\BNPL\Api\HokodoEntityRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResults;
 
 interface CompanyRepositoryInterface extends HokodoEntityRepositoryInterface
 {
@@ -30,4 +32,13 @@ interface CompanyRepositoryInterface extends HokodoEntityRepositoryInterface
      * @return \Hokodo\BnplCommerce\Api\Data\CompanyInterface
      */
     public function getByEntityId(int $entityId): CompanyInterface;
+
+    /**
+     * Get List.
+     *
+     * @param SearchCriteriaInterface $searchCriteria
+     *
+     * @return SearchResults
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria): SearchResults;
 }

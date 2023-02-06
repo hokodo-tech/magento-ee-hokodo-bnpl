@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
  * See LICENSE for license details.
  */
 
@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Controller\Adminhtml\Company;
 
+use Hokodo\BNPL\Api\CompanyCreditServiceInterface;
 use Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface;
-use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;

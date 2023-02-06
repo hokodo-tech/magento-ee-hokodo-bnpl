@@ -1,18 +1,18 @@
 <?php
 /**
- * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
  * See LICENSE for license details.
  */
 declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Plugin\Company\ResourceModel;
 
+use Hokodo\BNPL\Api\CompanyCreditServiceInterface;
 use Hokodo\BNPL\Api\Data\CompanyInterface as ApiCompany;
-use Hokodo\BnplCommerce\Api\CompanyCreditServiceInterface;
+use Hokodo\BNPL\Api\Data\Gateway\CompanySearchRequestInterface;
+use Hokodo\BNPL\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
+use Hokodo\BNPL\Gateway\Service\Company as Gateway;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterface;
-use Hokodo\BnplCommerce\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
-use Hokodo\BnplCommerce\Gateway\Service\Company as Gateway;
 use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
 use Magento\Framework\Exception\NotFoundException;
