@@ -7,7 +7,6 @@
     </type>
 
     <!-- Company Search -->
-    <preference for="Hokodo\BNPL\Api\Data\Gateway\CompanySearchRequestInterface" type="\Hokodo\BNPL\Model\Data\Gateway\CompanySearchRequest" />
 
     <virtualType name="Hokodo\BNPL\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>

@@ -208,9 +208,9 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         $items = [];
         foreach ($collectionItems as $item) {
-            $companyModel = $this->companyFactory->create();
-            $companyModel->setData($item->getData());
-            $items[] = $this->populateDataObject($companyModel);
+            $companyDataModel = $this->companyFactory->create();
+            $companyDataModel->setData($item->getData());
+            $items[] = $this->populateDataObject($companyDataModel);
         }
         return $items;
     }
