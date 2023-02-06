@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Observer;
 
 use Hokodo\BNPL\Gateway\Config\Config;
+use Hokodo\BNPL\Model\CompanyCreditService;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
-use Hokodo\BnplCommerce\Model\CompanyCreditService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
