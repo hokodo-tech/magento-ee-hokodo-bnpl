@@ -1,11 +1,15 @@
 <?php
+/**
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
+ * See LICENSE for license details.
+ */
 
 declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Block\Adminhtml\Company\Edit;
 
+use Hokodo\BNPL\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
-use Hokodo\BnplCommerce\Api\Data\Company\CreditLimitInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;

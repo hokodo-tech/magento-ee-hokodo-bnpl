@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018-2021 Hokodo. All Rights Reserved.
+ * Copyright © 2018-2023 Hokodo. All Rights Reserved.
  * See LICENSE for license details.
  */
 
@@ -13,8 +13,13 @@ use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
 use Hokodo\BnplCommerce\Model\Company as CompanyModel;
 use Hokodo\BnplCommerce\Model\ResourceModel\Company as CompanyResource;
+use Hokodo\BnplCommerce\Model\ResourceModel\Company\CollectionFactory as HokodoCompanyCollectionFactory;
 use Magento\Company\Api\CompanyManagementInterface;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResults;
+use Magento\Framework\Api\SearchResultsFactory;
 use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -56,20 +61,41 @@ class CompanyRepository implements CompanyRepositoryInterface
     private SerializerInterface $serializer;
 
     /**
+     * @var HokodoCompanyCollectionFactory
+     */
+    private HokodoCompanyCollectionFactory $hokodoCompanyCollectionFactory;
+
+    /**
+     * @var CollectionProcessorInterface
+     */
+    private CollectionProcessorInterface $collectionProcessor;
+
+    /**
+     * @var SearchResultsFactory
+     */
+    private SearchResultsFactory $searchResultsFactory;
+
+    /**
      * CompanyRepository constructor.
      *
-     * @param DataObjectHelper           $dataObjectHelper
-     * @param CompanyFactory             $companyFactory
-     * @param CompanyResource            $companyResource
-     * @param CompanyInterfaceFactory    $companyInterfaceFactory
-     * @param CompanyManagementInterface $companyManagement
-     * @param Logger                     $logger
-     * @param SerializerInterface        $serializer
+     * @param DataObjectHelper               $dataObjectHelper
+     * @param CompanyFactory                 $companyFactory
+     * @param CompanyResource                $companyResource
+     * @param HokodoCompanyCollectionFactory $hokodoCompanyCollectionFactory
+     * @param CollectionProcessorInterface   $collectionProcessor
+     * @param SearchResultsFactory           $searchResultsFactory
+     * @param CompanyInterfaceFactory        $companyInterfaceFactory
+     * @param CompanyManagementInterface     $companyManagement
+     * @param Logger                         $logger
+     * @param SerializerInterface            $serializer
      */
     public function __construct(
         DataObjectHelper $dataObjectHelper,
         CompanyFactory $companyFactory,
         CompanyResource $companyResource,
+        HokodoCompanyCollectionFactory $hokodoCompanyCollectionFactory,
+        CollectionProcessorInterface $collectionProcessor,
+        SearchResultsFactory $searchResultsFactory,
         CompanyInterfaceFactory $companyInterfaceFactory,
         CompanyManagementInterface $companyManagement,
         Logger $logger,
@@ -78,6 +104,9 @@ class CompanyRepository implements CompanyRepositoryInterface
         $this->dataObjectHelper = $dataObjectHelper;
         $this->companyFactory = $companyFactory;
         $this->companyResource = $companyResource;
+        $this->hokodoCompanyCollectionFactory = $hokodoCompanyCollectionFactory;
+        $this->collectionProcessor = $collectionProcessor;
+        $this->searchResultsFactory = $searchResultsFactory;
         $this->companyInterfaceFactory = $companyInterfaceFactory;
         $this->companyManagement = $companyManagement;
         $this->logger = $logger;
@@ -147,5 +176,42 @@ class CompanyRepository implements CompanyRepositoryInterface
         }
 
         $this->companyResource->save($companyModel);
+    }
+
+    /**
+     * Get List.
+     *
+     * @param SearchCriteriaInterface $searchCriteria
+     *
+     * @return SearchResults
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria): SearchResults
+    {
+        $collection = $this->hokodoCompanyCollectionFactory->create();
+        $this->collectionProcessor->process($searchCriteria, $collection);
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($searchCriteria);
+        $searchResults->setItems($this->populateCollectionWithArray($collection->getItems()));
+        $searchResults->setTotalCount($collection->getSize());
+
+        return $searchResults;
+    }
+
+    /**
+     * Populate Collection with array.
+     *
+     * @param array $collectionItems
+     *
+     * @return array
+     */
+    private function populateCollectionWithArray(array $collectionItems): array
+    {
+        $items = [];
+        foreach ($collectionItems as $item) {
+            $companyDataModel = $this->companyFactory->create();
+            $companyDataModel->setData($item->getData());
+            $items[] = $this->populateDataObject($companyDataModel);
+        }
+        return $items;
     }
 }
