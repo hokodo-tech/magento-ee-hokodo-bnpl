@@ -49,4 +49,6 @@
         <plugin name="update_company_credit_limit_after_void"
                 type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
     </type>
+    <preference for="Hokodo\BNPL\Model\RequestBuilder\OrganisationBuilder"
+                type="Hokodo\BnplCommerce\Model\RequestBuilder\OrganisationBuilder"/>
 </config>
