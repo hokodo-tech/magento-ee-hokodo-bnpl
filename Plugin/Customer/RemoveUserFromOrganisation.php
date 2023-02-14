@@ -124,7 +124,6 @@ class RemoveUserFromOrganisation
                 $this->hokodoCustomerRepository->save($hokodoCustomer);
             } catch (\Exception $e) {
                 $data = [
-                    //@codingStandardsIgnoreLine
                     'message' => 'Hokodo_BNPL: remove user from organisation failed with error',
                     'error' => $e->getMessage(),
                 ];
@@ -151,9 +150,9 @@ class RemoveUserFromOrganisation
      *
      * @return bool
      */
-    private function isCompanyChanged(CustomerInterface $customer, CustomerInterface $updatedCustomer)
+    private function isCompanyChanged(CustomerInterface $customer, CustomerInterface $updatedCustomer): bool
     {
-        return $customer->getExtensionAttributes()->getCompanyAttributes()->getCompanyId() !==
-            $updatedCustomer->getExtensionAttributes()->getCompanyAttributes()->getCompanyId();
+        return $customer->getExtensionAttributes()?->getCompanyAttributes()?->getCompanyId() !==
+            $updatedCustomer->getExtensionAttributes()?->getCompanyAttributes()?->getCompanyId();
     }
 }
