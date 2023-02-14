@@ -37,6 +37,8 @@
         </arguments>
     </type>
     <!-- Logger section end -->
+
+    <!-- Update Credit limit section -->
     <type name="Hokodo\BNPL\Gateway\Command\PostSale\CapturePayment">
         <plugin name="update_company_credit_limit_after_capture"
                 type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
@@ -49,6 +51,56 @@
         <plugin name="update_company_credit_limit_after_void"
                 type="Hokodo\BnplCommerce\Plugin\PostSale\UpdateCompanyCreditLimit"/>
     </type>
+    <!-- /Update Credit limit section -->
+
+    <!-- Organisation builder change for ee -->
     <preference for="Hokodo\BNPL\Model\RequestBuilder\OrganisationBuilder"
                 type="Hokodo\BnplCommerce\Model\RequestBuilder\OrganisationBuilder"/>
+    <!-- /Organisation builder change for ee -->
+
+    <!-- Hokodo organisation management logic -->
+    <type name="Magento\Customer\Api\CustomerRepositoryInterface">
+        <plugin name="remove_hokodo_user_from_organisation"
+                type="Hokodo\BnplCommerce\Plugin\Customer\RemoveUserFromOrganisation"/>
+    </type>
+    <type name="Hokodo\BnplCommerce\Plugin\Customer\RemoveUserFromOrganisation">
+        <arguments>
+            <argument name="logger" xsi:type="object">HokodoLogger</argument>
+            <argument name="commandPool" xsi:type="object">Hokodo\BNPL\Gateway\Command\CommandPool</argument>
+        </arguments>
+    </type>
+    <!-- /Hokodo organisation management logic -->
+
+    <!-- Organisation remove user gateway set up -->
+    <virtualType name="Hokodo\BNPL\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="organisation_user_remove" xsi:type="string">Hokodo\BNPL\Gateway\Command\OrganisationUserRemove</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BNPL\Gateway\Command\OrganisationUserRemove" type="Hokodo\BNPL\Gateway\Command\HokodoGatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Hokodo\BNPL\Gateway\Request\OrganisationUserRemove\BuilderComposite</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BNPL\Gateway\Request\OrganisationUserRemove\BuilderComposite" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="api_key" xsi:type="string">Hokodo\BNPL\Gateway\Request\AuthorizationBuilder</item>
+                <item name="uri" xsi:type="string">Hokodo\BNPL\Gateway\Request\Sdk\OrganisationUserDeleteEndpointBuilder</item>
+                <item name="method" xsi:type="string">Hokodo\BNPL\Gateway\Request\DeleteMethodBuilder</item>
+                <item name="body" xsi:type="string">Hokodo\BNPL\Gateway\Request\Sdk\GeneralSubjectBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Hokodo\BNPL\Gateway\Request\Sdk\OrganisationUserDeleteEndpointBuilder" type="Hokodo\BNPL\Gateway\Request\Sdk\EndpointBuilder">
+        <arguments>
+            <argument name="endpoint" xsi:type="string">organisations/:organisation/users/:user</argument>
+            <argument name="params" xsi:type="array">
+                <item name=":organisation" xsi:type="string">organisation_id</item>
+                <item name=":user" xsi:type="string">user_id</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

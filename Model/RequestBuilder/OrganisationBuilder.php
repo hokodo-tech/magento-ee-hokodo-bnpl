@@ -76,10 +76,22 @@ class OrganisationBuilder extends \Hokodo\BNPL\Model\RequestBuilder\Organisation
             $company = $this->companyManagement->getByCustomerId($this->customerRepository->get($userEmail)->getId());
             return $gatewayRequest
                 ->setCompanyId($companyId)
-                ->setUniqueId('mage-org-' . hash('md5', $companyId . $company->getId()))
+                ->setUniqueId($this->generateUniqueId($companyId . $company->getId()))
                 ->setRegistered(date('Y-m-d\TH:i:s\Z'));
         }
 
         return parent::build($companyId, $userEmail);
+    }
+
+    /**
+     * Generate uniqueId.
+     *
+     * @param string $stringToHash
+     *
+     * @return string
+     */
+    public function generateUniqueId(string $stringToHash): string
+    {
+        return 'mage-org-' . hash('md5', $stringToHash);
     }
 }
