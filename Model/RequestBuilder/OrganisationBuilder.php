@@ -74,13 +74,14 @@ class OrganisationBuilder extends \Hokodo\BNPL\Model\RequestBuilder\Organisation
         if ($this->hokodoEntityTypeResolver->resolve() === EntityLevelForSave::COMPANY) {
             $gatewayRequest = $this->createOrganisationGatewayRequestFactory->create();
             try {
-                $company = $this->companyManagement->getByCustomerId(
+                if ($company = $this->companyManagement->getByCustomerId(
                     $this->customerRepository->get($userEmail)->getId()
-                );
-                return $gatewayRequest
-                    ->setCompanyId($companyId)
-                    ->setUniqueId($this->generateUniqueId($companyId . $company->getId()))
-                    ->setRegistered(date('Y-m-d\TH:i:s\Z'));
+                )) {
+                    return $gatewayRequest
+                        ->setCompanyId($companyId)
+                        ->setUniqueId($this->generateUniqueId($companyId . $company->getId()))
+                        ->setRegistered(date('Y-m-d\TH:i:s\Z'));
+                }
                 //@codingStandardsIgnoreStart
             } catch (\Exception $e) {
                 //This catch is empty for now as we are just fallback here to guest checkout.
