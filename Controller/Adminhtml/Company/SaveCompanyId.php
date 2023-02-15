@@ -9,8 +9,11 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Controller\Adminhtml\Company;
 
 use Hokodo\BNPL\Api\CompanyCreditServiceInterface;
+use Hokodo\BNPL\Api\Data\Gateway\CreateOrganisationRequestInterfaceFactory;
 use Hokodo\BNPL\Api\HokodoQuoteRepositoryInterface;
+use Hokodo\BNPL\Gateway\Service\Organisation;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
+use Hokodo\BnplCommerce\Model\RequestBuilder\OrganisationBuilder;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Company\Api\CompanyRepositoryInterface as MagentoCompanyRepositoryInterface;
@@ -21,6 +24,8 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
@@ -67,17 +72,35 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
     private CompanyCreditServiceInterface $companyCreditService;
 
     /**
+     * @var OrganisationBuilder
+     */
+    private OrganisationBuilder $organisationBuilder;
+
+    /**
+     * @var CreateOrganisationRequestInterfaceFactory
+     */
+    private CreateOrganisationRequestInterfaceFactory $createOrganisationRequestFactory;
+
+    /**
+     * @var Organisation
+     */
+    private Organisation $organisationService;
+
+    /**
      * SaveCompanyId constructor.
      *
-     * @param Context                           $context
-     * @param CompanyRepositoryInterface        $companyRepository
-     * @param CartRepositoryInterface           $cartRepository
-     * @param SessionCleanerInterface           $sessionCleaner
-     * @param CompanyUsers                      $companyUsers
-     * @param MagentoCompanyRepositoryInterface $magentoCompanyRepository
-     * @param HokodoQuoteRepositoryInterface    $hokodoQuoteRepository
-     * @param LoggerInterface                   $logger
-     * @param CompanyCreditServiceInterface     $companyCreditService
+     * @param Context                                   $context
+     * @param CompanyRepositoryInterface                $companyRepository
+     * @param CartRepositoryInterface                   $cartRepository
+     * @param SessionCleanerInterface                   $sessionCleaner
+     * @param CompanyUsers                              $companyUsers
+     * @param MagentoCompanyRepositoryInterface         $magentoCompanyRepository
+     * @param HokodoQuoteRepositoryInterface            $hokodoQuoteRepository
+     * @param LoggerInterface                           $logger
+     * @param CompanyCreditServiceInterface             $companyCreditService
+     * @param OrganisationBuilder                       $organisationBuilder
+     * @param CreateOrganisationRequestInterfaceFactory $createOrganisationRequestFactory
+     * @param Organisation                              $organisationService
      */
     public function __construct(
         Context $context,
@@ -89,6 +112,9 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         HokodoQuoteRepositoryInterface $hokodoQuoteRepository,
         LoggerInterface $logger,
         CompanyCreditServiceInterface $companyCreditService,
+        OrganisationBuilder $organisationBuilder,
+        CreateOrganisationRequestInterfaceFactory $createOrganisationRequestFactory,
+        Organisation $organisationService
     ) {
         parent::__construct($context);
         $this->companyRepository = $companyRepository;
@@ -99,6 +125,9 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
         $this->hokodoQuoteRepository = $hokodoQuoteRepository;
         $this->logger = $logger;
         $this->companyCreditService = $companyCreditService;
+        $this->organisationBuilder = $organisationBuilder;
+        $this->createOrganisationRequestFactory = $createOrganisationRequestFactory;
+        $this->organisationService = $organisationService;
     }
 
     /**
@@ -123,9 +152,11 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             }
             $oldCompanyId = $hokodoCompany->getCompanyId();
             $hokodoCompany->setCompanyId($companyId);
-            $hokodoCompany->setCreditLimit($this->companyCreditService->getCreditLimit($companyId));
 
             try {
+                $hokodoCompany->setCreditLimit($this->companyCreditService->getCreditLimit($companyId));
+                $hokodoCompany->setOrganisationId($this->getOrganisationId($companyId, (string) $entityId));
+
                 $data = [
                     'entityId' => $entityId,
                     'companyId' => $companyId,
@@ -199,5 +230,32 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             ];
             $this->logger->error(__METHOD__, $data);
         }
+    }
+
+    /**
+     * Get hokodo organisation id.
+     *
+     * @param string $hokodoCompanyId
+     * @param string $magentoCompanyId
+     *
+     * @return string
+     *
+     * @throws CommandException
+     * @throws NotFoundException
+     */
+    private function getOrganisationId(string $hokodoCompanyId, string $magentoCompanyId): string
+    {
+        $createOrganisationRequest = $this->createOrganisationRequestFactory->create();
+        $createOrganisationRequest
+            ->setCompanyId($hokodoCompanyId)
+            ->setUniqueId($this->organisationBuilder->generateUniqueId($hokodoCompanyId . $magentoCompanyId))
+            ->setRegistered(date('Y-m-d\TH:i:s\Z'));
+
+        $organisation = $this->organisationService->createOrganisation($createOrganisationRequest);
+        if ($organisation) {
+            return $organisation->getDataModel()->getId();
+        }
+
+        return '';
     }
 }
