@@ -77,7 +77,7 @@ class RemoveUserFromOrganisation
         $passwordHash = null
     ): CustomerInterface {
         if ($this->isCustomerCanBeProcessed() && $this->isCompanyChanged($customer, $result)) {
-            $this->removeUserFromOrganisation($result);
+            $this->removeUserFromOrganisation((int) $result->getId());
         }
         return $result;
     }
@@ -86,18 +86,18 @@ class RemoveUserFromOrganisation
      * After delete method.
      *
      * @param CustomerRepositoryInterface $subject
-     * @param CustomerInterface           $result
-     * @param CustomerInterface           $customer
+     * @param bool                        $result
+     * @param string|int                  $customerId
      *
-     * @return CustomerInterface
+     * @return bool
      */
-    public function afterDelete(
+    public function afterDeleteById(
         CustomerRepositoryInterface $subject,
-        CustomerInterface $result,
-        CustomerInterface $customer
-    ): CustomerInterface {
-        if ($this->isCustomerCanBeProcessed()) {
-            $this->removeUserFromOrganisation($result);
+        $result,
+        $customerId
+    ): bool {
+        if ($result && $this->isCustomerCanBeProcessed()) {
+            $this->removeUserFromOrganisation((int) $customerId);
         }
         return $result;
     }
@@ -105,13 +105,13 @@ class RemoveUserFromOrganisation
     /**
      * Remove user from Hokodo organisation.
      *
-     * @param CustomerInterface $customer
+     * @param int $customerId
      *
      * @return void
      */
-    public function removeUserFromOrganisation(CustomerInterface $customer): void
+    public function removeUserFromOrganisation(int $customerId): void
     {
-        $hokodoCustomer = $this->hokodoCustomerRepository->getByCustomerId((int) $customer->getId());
+        $hokodoCustomer = $this->hokodoCustomerRepository->getByCustomerId($customerId);
         if ($hokodoCustomer->getUserId() && $hokodoCustomer->getOrganisationId()) {
             try {
                 $this->commandPool->get('organisation_user_remove')->execute(
