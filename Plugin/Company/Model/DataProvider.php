@@ -50,18 +50,20 @@ class DataProvider
      */
     public function afterGetCompanyResultData(CompanyDataProvider $subject, array $result)
     {
+        $result['hokodo'] = [
+            'submit_url' => $this->urlBuilder->getUrl('hokodo_commerce/company/savecompanyid'),
+            'company_credit_url' => $this->urlBuilder->getUrl('hokodo/company/credit'),
+        ];
         $hokodoCompanyId = '';
         if ($entityId = $result['id']) {
             $company = $this->companyRepository->getByEntityId((int) $entityId);
             if ($companyId = $company->getCompanyId()) {
                 $hokodoCompanyId = $companyId;
             }
+            $result['hokodo']['credit_limit'] =
+                $company->getCreditLimit() ? $company->getCreditLimit()->getData() : null;
         }
-        $result['hokodo'] = [
-            'company_id' => $hokodoCompanyId ?: '',
-            'submit_url' => $this->urlBuilder->getUrl('hokodo_commerce/company/savecompanyid'),
-            'credit_limit' => $company->getCreditLimit() ? $company->getCreditLimit()->getData() : null,
-        ];
+        $result['hokodo']['company_id'] = $hokodoCompanyId;
         return $result;
     }
 }
