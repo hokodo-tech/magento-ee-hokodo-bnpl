@@ -1,25 +1,21 @@
 <?php
 
-declare(strict_types=1);
+namespace Hokodo\BnplCommerce\Observer\Customer;
 
-namespace Hokodo\BnplCommerce\Plugin\Customer;
-
-use Hokodo\BNPL\Api\Data\HokodoCustomerInterface;
 use Hokodo\BNPL\Api\HokodoCustomerRepositoryInterface;
 use Hokodo\BNPL\Api\HokodoEntityTypeResolverInterface;
 use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
-use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Psr\Log\LoggerInterface;
 
-class RemoveUserFromOrganisation
+/**
+ * Observes the `customer_save_after_data_object` event.
+ */
+class RemoveUserFromOrganisationObserver implements ObserverInterface
 {
-    /**
-     * @var HokodoCustomerInterface|null
-     */
-    private $hokodoCustomerToDelete;
-
     /**
      * @var HokodoCustomerRepositoryInterface
      */
@@ -31,17 +27,17 @@ class RemoveUserFromOrganisation
     private HokodoEntityTypeResolverInterface $entityTypeResolver;
 
     /**
-     * @var CommandPoolInterface
-     */
-    private CommandPoolInterface $commandPool;
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
 
     /**
-     * RemoveUserFromOrganisation constructor.
+     * @var CommandPoolInterface
+     */
+    private CommandPoolInterface $commandPool;
+
+    /**
+     * RemoveUserFromOrganisationObserver constructor.
      *
      * @param HokodoCustomerRepositoryInterface $hokodoCustomerRepository
      * @param HokodoEntityTypeResolverInterface $entityTypeResolver
@@ -62,57 +58,48 @@ class RemoveUserFromOrganisation
     }
 
     /**
-     * Save hokodo user before it will be deleted from DB.
+     * Observer for customer_save_after_data_object.
      *
-     * @param CustomerRepositoryInterface $subject
-     * @param string|int                  $customerId
+     * @param Observer $observer
      *
      * @return void
      */
-    public function beforeDeleteById(CustomerRepositoryInterface $subject, $customerId)
+    public function execute(Observer $observer)
     {
-        $this->hokodoCustomerToDelete = $this->hokodoCustomerRepository->getByCustomerId((int) $customerId);
-    }
-
-    /**
-     * After delete method.
-     *
-     * @param CustomerRepositoryInterface $subject
-     * @param bool                        $result
-     * @param string|int                  $customerId
-     *
-     * @return bool
-     */
-    public function afterDeleteById(
-        CustomerRepositoryInterface $subject,
-        $result,
-        $customerId
-    ): bool {
-        if ($result && $this->isCustomerCanBeProcessed()) {
-            $this->removeUserFromOrganisation();
+        $originalCustomer = $observer->getEvent()->getOrigCustomerDataObject();
+        if (!$originalCustomer) {
+            return;
         }
-        return $result;
+
+        $customer = $observer->getEvent()->getCustomerDataObject();
+        if ($this->isCustomerCanBeProcessed() && $this->isCompanyChanged($originalCustomer, $customer)) {
+            $this->removeUserFromOrganisation($customer);
+        }
     }
 
     /**
      * Remove user from Hokodo organisation.
      *
+     * @param CustomerInterface $customer
+     *
      * @return void
      */
-    public function removeUserFromOrganisation(): void
+    public function removeUserFromOrganisation(CustomerInterface $customer): void
     {
-        if ($this->hokodoCustomerToDelete
-            && $this->hokodoCustomerToDelete->getUserId()
-            && $this->hokodoCustomerToDelete->getOrganisationId()
+        $hokodoCustomer = $this->hokodoCustomerRepository->getByCustomerId($customer->getId());
+        if ($hokodoCustomer->getCustomerId()
+            && $hokodoCustomer->getUserId()
+            && $hokodoCustomer->getOrganisationId()
         ) {
             try {
                 $this->commandPool->get('organisation_user_remove')->execute(
                     [
-                        'organisation_id' => $this->hokodoCustomerToDelete->getOrganisationId(),
-                        'user_id' => $this->hokodoCustomerToDelete->getUserId(),
+                        'organisation_id' => $hokodoCustomer->getOrganisationId(),
+                        'user_id' => $hokodoCustomer->getUserId(),
                     ]
                 );
-                $this->hokodoCustomerToDelete = null;
+                $hokodoCustomer->setOrganisationId('');
+                $this->hokodoCustomerRepository->save($hokodoCustomer);
             } catch (\Exception $e) {
                 $data = [
                     'message' => 'Hokodo_BNPL: remove user from organisation failed with error',

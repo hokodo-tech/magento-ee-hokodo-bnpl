@@ -5,4 +5,8 @@
         <observer name="hokodo_company_update_credit_limit"
                   instance="Hokodo\BnplCommerce\Observer\OrderPlaceSuccessObserver"/>
     </event>
+    <event name="customer_save_after_data_object">
+        <observer name="hokodo_remove_user_from_organisation_observer"
+                  instance="Hokodo\BnplCommerce\Observer\Customer\RemoveUserFromOrganisationObserver"/>
+    </event>
 </config>
