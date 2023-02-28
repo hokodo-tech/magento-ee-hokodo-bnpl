@@ -86,7 +86,7 @@ class RemoveUserFromOrganisationObserver implements ObserverInterface
      */
     public function removeUserFromOrganisation(CustomerInterface $customer): void
     {
-        $hokodoCustomer = $this->hokodoCustomerRepository->getByCustomerId($customer->getId());
+        $hokodoCustomer = $this->hokodoCustomerRepository->getByCustomerId((int) $customer->getId());
         if ($hokodoCustomer->getCustomerId()
             && $hokodoCustomer->getUserId()
             && $hokodoCustomer->getOrganisationId()
