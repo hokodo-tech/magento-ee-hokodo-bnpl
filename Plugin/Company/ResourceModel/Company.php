@@ -144,8 +144,8 @@ class Company
                 return reset($list);
             } else {
                 $this->notifier->addMajor(
-                    __('Hokodo BNPL: auto company assignment failed.'),
-                    __('Please review company %1 manually', $company->getCompanyName()),
+                    __('Hokodo Payment Method: Automated company matching has failed.'),
+                    __('Please review the info of the following company: %1', $company->getCompanyName()),
                     $this->url->getUrl(
                         'company/index/edit',
                         ['_secure' => true, 'id' => $company->getId()]
