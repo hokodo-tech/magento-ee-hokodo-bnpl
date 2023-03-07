@@ -69,6 +69,12 @@
             <argument name="commandPool" xsi:type="object">Hokodo\BNPL\Gateway\Command\CommandPool</argument>
         </arguments>
     </type>
+    <type name="Hokodo\BnplCommerce\Observer\Customer\RemoveUserFromOrganisationObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">HokodoLogger</argument>
+            <argument name="commandPool" xsi:type="object">Hokodo\BNPL\Gateway\Command\CommandPool</argument>
+        </arguments>
+    </type>
     <!-- /Hokodo organisation management logic -->
 
     <!-- Organisation remove user gateway set up -->
