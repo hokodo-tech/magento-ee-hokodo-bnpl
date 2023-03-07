@@ -13,9 +13,11 @@ use Hokodo\BNPL\Api\Data\Gateway\CompanySearchRequestInterface;
 use Hokodo\BNPL\Api\Data\Gateway\CompanySearchRequestInterfaceFactory;
 use Hokodo\BNPL\Gateway\Service\Company as Gateway;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
+use Magento\Backend\Model\UrlInterface;
 use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
 use Magento\Framework\Exception\NotFoundException;
+use Magento\Framework\Notification\NotifierInterface;
 use Magento\Payment\Gateway\Command\CommandException;
 use Psr\Log\LoggerInterface;
 
@@ -54,6 +56,16 @@ class Company
     private CompanyCreditServiceInterface $companyCreditService;
 
     /**
+     * @var NotifierInterface
+     */
+    private NotifierInterface $notifier;
+
+    /**
+     * @var UrlInterface
+     */
+    private UrlInterface $url;
+
+    /**
      * Company constructor.
      *
      * @param CompanyRepositoryInterface           $companyRepository
@@ -61,6 +73,8 @@ class Company
      * @param CompanySearchRequestInterfaceFactory $companySearchRequestFactory
      * @param LoggerInterface                      $logger
      * @param CompanyCreditServiceInterface        $companyCreditService
+     * @param NotifierInterface                    $notifier
+     * @param UrlInterface                         $url
      * @param string|null                          $regNumberAttributeCode
      */
     public function __construct(
@@ -69,6 +83,8 @@ class Company
         CompanySearchRequestInterfaceFactory $companySearchRequestFactory,
         LoggerInterface $logger,
         CompanyCreditServiceInterface $companyCreditService,
+        NotifierInterface $notifier,
+        UrlInterface $url,
         ?string $regNumberAttributeCode = null
     ) {
         $this->companyRepository = $companyRepository;
@@ -77,6 +93,8 @@ class Company
         $this->logger = $logger;
         $this->regNumberAttributeCode = $regNumberAttributeCode ?: self::DEFAULT_REG_NUMBER_ATTRIBUTE_CODE;
         $this->companyCreditService = $companyCreditService;
+        $this->notifier = $notifier;
+        $this->url = $url;
     }
 
     /**
@@ -124,6 +142,15 @@ class Company
         try {
             if ($list = $this->gateway->search($searchRequest)->getList()) {
                 return reset($list);
+            } else {
+                $this->notifier->addMajor(
+                    __('Hokodo Payment Method: Automated company matching has failed.'),
+                    __('Please review the info of the following company: %1', $company->getCompanyName()),
+                    $this->url->getUrl(
+                        'company/index/edit',
+                        ['_secure' => true, 'id' => $company->getId()]
+                    )
+                );
             }
         } catch (NotFoundException|CommandException $e) {
             $data = [
