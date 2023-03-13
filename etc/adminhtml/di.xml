@@ -2,7 +2,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Hokodo\BNPL\Ui\Component\Customer\Form\HokodoFieldset">
-        <plugin name="hokodo_bnpl_adminhtml_customer_account_hide_my_copany_tab"
+        <plugin name="hokodo_bnpl_adminhtml_customer_account_hide_my_company_tab"
                 type="Hokodo\BnplCommerce\Plugin\BNPL\Ui\Component\Customer\Form\HokodoFieldsetPlugin"/>
     </type>
+
+    <!-- Customer Grid Add Additional Column Begin-->
+    <preference for="Hokodo\BNPL\Service\Customer\Grid\QueryConfigInterface"
+                type="Hokodo\BnplCommerce\Service\Customer\Grid\QueryConfig" />
+    <!-- Customer Grid Add Additional Column END-->
 </config>
