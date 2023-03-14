@@ -35,13 +35,7 @@ class QueryConfig implements QueryConfigInterface
      */
     public function getIsNullQuery(): string
     {
-        $query = '!ISNULL(`hokodo_customer_table`.`company_id`)';
-        $entityType = $this->hokodoEntityTypeResolver->resolve();
-        if ($entityType == EntityLevelForSave::COMPANY) {
-            $query = '!ISNULL(`hokodo_company_table`.`company_id`)';
-        }
-
-        return $query;
+        return '!ISNULL(`hokodo_entity_table`.`company_id`)';
     }
 
     /**
@@ -53,10 +47,10 @@ class QueryConfig implements QueryConfigInterface
     {
         $additionalTables = [
             'hokodo_customer' => [
-                'alias' => 'hokodo_customer_table',
-                'condition' => 'main_table.entity_id = hokodo_customer_table.customer_id',
+                'alias' => 'hokodo_entity_table',
+                'condition' => 'main_table.entity_id = hokodo_entity_table.customer_id',
                 'columns' => [
-                    'hokodo_company_id' => 'hokodo_customer_table.company_id',
+                    'hokodo_company_id' => 'hokodo_entity_table.company_id',
                     'is_hokodo_company_assigned' => new \Zend_Db_Expr($this->getIsNullQuery()),
                 ],
             ],
@@ -73,10 +67,10 @@ class QueryConfig implements QueryConfigInterface
                     ],
                 ],
                 'hokodo_company' => [
-                    'alias' => 'hokodo_company_table',
-                    'condition' => 'company_customer.company_id = hokodo_company_table.entity_id',
+                    'alias' => 'hokodo_entity_table',
+                    'condition' => 'company_customer.company_id = hokodo_entity_table.entity_id',
                     'columns' => [
-                        'hokodo_company_id' => 'hokodo_company_table.company_id',
+                        'hokodo_company_id' => 'hokodo_entity_table.company_id',
                         'is_hokodo_company_assigned' => new \Zend_Db_Expr($this->getIsNullQuery()),
                     ],
                 ],
