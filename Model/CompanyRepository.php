@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Hokodo\BnplCommerce\Model;
 
+use Hokodo\BNPL\Api\Data\HokodoEntityInterface;
 use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterface;
 use Hokodo\BnplCommerce\Api\Data\CompanyInterfaceFactory;
@@ -213,5 +214,17 @@ class CompanyRepository implements CompanyRepositoryInterface
             $items[] = $this->populateDataObject($companyDataModel);
         }
         return $items;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     */
+    public function saveHokodoEntity(HokodoEntityInterface $hokodoEntity): void
+    {
+        if ($hokodoEntity instanceof CompanyInterface) {
+            $this->save($hokodoEntity);
+        }
     }
 }
