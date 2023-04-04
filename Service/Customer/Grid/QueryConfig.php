@@ -29,6 +29,16 @@ class QueryConfig implements QueryConfigInterface
     }
 
     /**
+     * Get query.
+     *
+     * @return string
+     */
+    public function getIsNullQuery(): string
+    {
+        return '!ISNULL(`hokodo_entity_table`.`company_id`)';
+    }
+
+    /**
      * Get additional tables.
      *
      * @return array
