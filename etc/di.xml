@@ -94,4 +94,10 @@
             </argument>
         </arguments>
     </virtualType>
+    <!-- Plugin for import -->
+    <type name="Hokodo\BNPL\Model\Queue\Handler\CompanyImport">
+        <plugin name="hokodo_bnplcommerce_set_entity_id"
+                type="Hokodo\BnplCommerce\Plugin\BNPL\Model\Queue\Handler\CompanyImportPlugin"/>
+    </type>
+    <!-- Plugin for import -->
 </config>
