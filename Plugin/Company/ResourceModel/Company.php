@@ -16,9 +16,7 @@ use Hokodo\BnplCommerce\Api\CompanyRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Company\Model\Company as MagentoCompanyModel;
 use Magento\Company\Model\ResourceModel\Company as MagentoCompanyResource;
-use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Notification\NotifierInterface;
-use Magento\Payment\Gateway\Command\CommandException;
 use Psr\Log\LoggerInterface;
 
 class Company
@@ -152,7 +150,7 @@ class Company
                     )
                 );
             }
-        } catch (NotFoundException|CommandException $e) {
+        } catch (\Exception $e) {
             $data = [
                 'message' => __('Can not find company. %1', $e->getMessage()),
             ];
