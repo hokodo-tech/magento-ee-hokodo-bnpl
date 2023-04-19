@@ -154,14 +154,15 @@ class SaveCompanyId extends Action implements HttpPostActionInterface
             $hokodoCompany->setCompanyId($companyId);
 
             try {
-                $hokodoCompany->setCreditLimit($this->companyCreditService->getCreditLimit($companyId));
-                $hokodoCompany->setOrganisationId($this->getOrganisationId($companyId, (string) $entityId));
-
                 $data = [
                     'entityId' => $entityId,
                     'companyId' => $companyId,
                     'oldCompanyId' => $oldCompanyId,
                 ];
+
+                $hokodoCompany->setCreditLimit($this->companyCreditService->getCreditLimit($companyId));
+                $hokodoCompany->setOrganisationId($this->getOrganisationId($companyId, (string) $entityId));
+
                 foreach ($this->getCompanyUsers($entityId) as $user) {
                     $this->resetUserCartSession($user);
                 }
