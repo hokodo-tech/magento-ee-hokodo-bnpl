@@ -26,7 +26,7 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 0 : 0,
+  retries: process.env.CI ? 3 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -34,7 +34,7 @@ const config: PlaywrightTestConfig = {
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: process.env.CI ? 60000 : 15000,
+    actionTimeout: process.env.CI ? 30000 : 15000,
     navigationTimeout: 85000,
     screenshot: "only-on-failure",
     headless: !!process.env.CI, 
@@ -42,7 +42,7 @@ const config: PlaywrightTestConfig = {
     baseURL: process.env.BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: process.env.CI ? "retain-on-failure" : "on",
+    trace: process.env.CI ? "on" : "on",
   },
 
   /* Configure projects for major browsers */
