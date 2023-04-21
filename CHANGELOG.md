@@ -1,3 +1,8 @@
+1.0.2 / April 2023
+==================
+* Import to support Company id
+* Fix order documents endpoint
+
 1.0.1 / April 2023
 ==================
 * Fix logger issue
