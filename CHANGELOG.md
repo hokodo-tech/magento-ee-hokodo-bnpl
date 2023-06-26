@@ -1,3 +1,7 @@
+1.0.3 / June 2023
+==================
+* API compatibility update
+
 1.0.2 / April 2023
 ==================
 * Import to support Company id
