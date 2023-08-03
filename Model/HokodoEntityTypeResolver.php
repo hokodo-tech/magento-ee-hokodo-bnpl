@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Hokodo\BnplCommerce\Model;
 
 use Hokodo\BNPL\Api\HokodoEntityTypeResolverInterface;
-use Hokodo\Bnpl\Gateway\Config\Config;
+use Hokodo\BNPL\Gateway\Config\Config;
 use Hokodo\BnplCommerce\Model\Config\Source\EntityLevelForSave;
 
 class HokodoEntityTypeResolver implements HokodoEntityTypeResolverInterface
