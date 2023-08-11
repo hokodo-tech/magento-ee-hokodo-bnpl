@@ -1,6 +1,6 @@
 {
     "name": "hokodo/magento-ee-bnpl",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Hokodo BNPL module for Magento EE",
     "type": "magento2-module",
     "minimum-stability": "stable",
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "hokodo/magento-bnpl": "^2.1.16"
+        "hokodo/magento-bnpl": "^2.2"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "@stable",
