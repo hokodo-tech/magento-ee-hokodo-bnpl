@@ -1,5 +1,5 @@
 stages:
-  - lint
+  - create
   - test
   - deploy
 
@@ -18,7 +18,7 @@ workflow:
 
 # ======= LINTERS [PHP] =======
 php:lint:
-  stage: lint
+  stage: create
   image: composer:latest
   variables:
     PHP_CS_FIXER_IGNORE_ENV: 1
@@ -31,7 +31,7 @@ php:lint:
     - vendor/bin/php-cs-fixer fix --config=../src/.php-cs-fixer.dist.php --dry-run --diff ../src/
 
 php:compat:
-  stage: lint
+  stage: create
   image: registry.gitlab.com/pipeline-components/php-codesniffer:latest
   variables:
     PHP_CS_FIXER_IGNORE_ENV: 1
@@ -44,7 +44,7 @@ php:compat:
 # ======= REVIEW INSTANCES =======
 .review:
   extends: .ssh-client
-  stage: test
+  stage: create
   variables:
     REVIEW_INSTANCE: magento_ee_$CI_MERGE_REQUEST_IID
     SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY_DEV
@@ -56,7 +56,7 @@ php:compat:
     - if: $CI_MERGE_REQUEST_ID
   resource_group: review
 
-# Magento 2.4.4
+# Magento
 review:create:
   extends: .review
 #  needs:
@@ -117,7 +117,12 @@ review:create:
         $PHP_CLI /usr/local/bin/$COMPOSER_CLI config --file=./auth.json http-basic.repo.magento.com '$MAGENTO_REPOSITORY_USER' '$MAGENTO_REPOSITORY_PASSWORD';
       } || echo 'Magento project was installed with sample data, skipping configuration.'"
     # Magento commands: setup:upgrade => setup:di:compile => cache:flush
-    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI bin/magento module:disable Magento_TwoFactorAuth && $PHP_CLI bin/magento se:up && $PHP_CLI bin/magento se:d:c && $PHP_CLI bin/magento c:f && $PHP_CLI app/code/Hokodo/BnplCommerce/Test/Fixtures/create-customers.php '$HOKODO_TEST_CUSTOMER_PASSWORD'"
+    - ssh "magento@$SSH_HOST" "cd $SSH_PATH && $PHP_CLI bin/magento module:disable Magento_TwoFactorAuth &&
+      $PHP_CLI bin/magento se:up && $PHP_CLI bin/magento se:d:c &&
+      $PHP_CLI bin/magento c:f &&
+      $PHP_CLI app/code/Hokodo/BnplCommerce/Test/Fixtures/create-customers.php '$HOKODO_TEST_CUSTOMER_PASSWORD' &&
+      $PHP_CLI bin/magento config:set payment/hokodo_bnpl/advanced/entity_level 'customer' &&
+      $PHP_CLI bin/magento ca:cl config"
 
 review:detach:
   extends: .review
