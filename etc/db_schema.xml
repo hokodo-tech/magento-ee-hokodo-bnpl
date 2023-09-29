@@ -6,7 +6,7 @@
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="false" comment="Magento company id" />
         <column xsi:type="varchar" name="company_id" nullable="false" length="64" comment="Hokodo company id" />
         <column xsi:type="varchar" name="organisation_id" nullable="true" length="255" comment="Hokodo Organisation Id"/>
-        <column xsi:type="varchar" name="credit_limit" nullable="true" length="255" default="NULL" comment="Hokodo company credit limit"/>
+        <column xsi:type="text" name="credit_limit" nullable="true" comment="Hokodo company credit limit"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id" />
         </constraint>

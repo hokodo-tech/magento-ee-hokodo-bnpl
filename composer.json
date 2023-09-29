@@ -1,6 +1,6 @@
 {
     "name": "hokodo/magento-ee-bnpl",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Hokodo BNPL module for Magento EE",
     "type": "magento2-module",
     "minimum-stability": "stable",
